@@ -1,12 +1,3 @@
-// Sonata Service Worker
-// Strategy:
-//  - App shell (HTML/CSS/JS/icons) -> precached on install, served cache-first,
-//    refreshed in the background on every navigation (stale-while-revalidate).
-//  - Track thumbnails (img.youtube.com) -> stale-while-revalidate, so cover art
-//    still shows up once a track has been viewed, even offline.
-//  - YouTube iframe API + Google APIs (googleapis.com) -> always network-only.
-//    These are live playback/data calls; caching them would risk stale quota
-//    state, broken embeds, or serving someone else's API response.
 
 const CACHE_VERSION = 'v1';
 const SHELL_CACHE = `sonata-shell-${CACHE_VERSION}`;
