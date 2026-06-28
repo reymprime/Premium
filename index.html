@@ -1,0 +1,2790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Sonata Elite</title>
+  <meta name="description" content="An offline-capable, YouTube-powered premium music player.">
+  <meta name="theme-color" content="#030014" id="meta-theme-color">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon-192.png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Sonata">
+  <meta name="mobile-web-app-capable" content="yes">
+  <style>
+    /* --- ULTRA LUXURY PREMIUM DESIGN SYSTEM --- */
+    :root {
+      --bg-gradient: radial-gradient(circle at 50% 0%, #0c0728 0%, #030014 100%);
+      --surface-color: rgba(10, 8, 28, 0.75);
+      --surface-glass: rgba(255, 255, 255, 0.03);
+      --border-color: rgba(255, 255, 255, 0.06);
+      --accent-color: #6366f1; /* Neon Electric Indigo */
+      --accent-rgb: 99, 102, 241;
+      --accent-gradient: linear-gradient(135deg, #8b5cf6 0%, #6366f1 50%, #3b82f6 100%);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --gold-accent: #fbbf24;
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --danger-color: #ff4a4a;
+      --danger-gradient: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);
+      --heading-gradient: linear-gradient(135deg, #ffffff 0%, #a5b4fc 100%);
+      --border-glow: rgba(var(--accent-rgb), 0.15);
+      --modal-surface: rgba(12, 9, 32, 0.96);   /* solid floating cards: albums, playlist, delete/rename modals */
+      --modal-border: rgba(255, 255, 255, 0.08);
+      --input-surface: rgba(255, 255, 255, 0.04); /* search bar, text inputs */
+      --glass-surface: rgba(255, 255, 255, 0.04);  /* tinted chips/rows sitting on top of a modal-surface card */
+      --glass-border: rgba(255, 255, 255, 0.06);
+      --glass-text: #ffffff;
+    }
+
+    [data-theme="oled"] {
+      --bg-gradient: linear-gradient(180deg, #000000 0%, #050505 100%);
+      --surface-color: rgba(10, 10, 10, 0.9);
+      --border-color: rgba(255, 255, 255, 0.04);
+      --surface-glass: rgba(255, 255, 255, 0.01);
+    }
+
+    [data-theme="light"] {
+      --bg-gradient: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+      --surface-color: rgba(255, 255, 255, 0.85);
+      --surface-glass: rgba(0, 0, 0, 0.02);
+      --border-color: rgba(0, 0, 0, 0.06);
+      --accent-color: #4f46e5;
+      --accent-rgb: 79, 70, 229;
+      --accent-gradient: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%);
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --heading-gradient: linear-gradient(135deg, #1e1b4b 0%, #4338ca 100%);
+      --modal-surface: rgba(255, 255, 255, 0.92);
+      --modal-border: rgba(15, 23, 42, 0.08);
+      --input-surface: rgba(15, 23, 42, 0.035);
+      --glass-surface: rgba(15, 23, 42, 0.035);
+      --glass-border: rgba(15, 23, 42, 0.08);
+      --glass-text: var(--text-main);
+    }
+
+    /* --- GREEN GLASSMORPHISM: deep emerald glass, same token system as every other theme --- */
+    [data-theme="green"] {
+      --bg-gradient: radial-gradient(circle at 50% 0%, #052e21 0%, #01120c 100%);
+      --surface-color: rgba(6, 38, 28, 0.75);
+      --surface-glass: rgba(110, 231, 183, 0.05);
+      --border-color: rgba(110, 231, 183, 0.12);
+      --accent-color: #10b981;
+      --accent-rgb: 16, 185, 129;
+      --accent-gradient: linear-gradient(135deg, #34d399 0%, #10b981 50%, #059669 100%);
+      --text-main: #ecfdf5;
+      --text-muted: #8fb6a8;
+      --heading-gradient: linear-gradient(135deg, #ecfdf5 0%, #6ee7b7 100%);
+      --modal-surface: rgba(4, 28, 21, 0.96);
+      --modal-border: rgba(110, 231, 183, 0.14);
+      --input-surface: rgba(110, 231, 183, 0.05);
+      --glass-surface: rgba(110, 231, 183, 0.06);
+      --glass-border: rgba(110, 231, 183, 0.12);
+      --glass-text: #ecfdf5;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+      user-select: none;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      background: var(--bg-gradient);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding-bottom: calc(120px + var(--safe-bottom));
+      overflow-x: hidden;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 480px;
+      padding: 24px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+      transition: max-width 0.2s ease;
+    }
+
+    /* --- HEADER AND PREMIUM INTERACTION --- */
+    header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      justify-content: space-between;
+    }
+
+    .logo-group h1 {
+      font-size: 28px;
+      font-weight: 900;
+      letter-spacing: -1.5px;
+      background: var(--heading-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 4px 12px rgba(var(--accent-rgb), 0.15);
+    }
+
+    .input-toggle-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-grow: 1;
+    }
+
+    .search-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+      flex-grow: 1;
+      max-width: 460px;
+      background: var(--input-surface);
+    }
+
+    .search-wrapper:focus-within {
+      border-color: var(--accent-color);
+      box-shadow: 0 0 20px var(--border-glow);
+    }
+
+    .search-wrapper input {
+      width: 100%;
+      background: transparent;
+      border: none;
+      color: var(--text-main);
+      font-size: 14px;
+      outline: none;
+    }
+
+    .search-btn {
+      position: absolute;
+      right: 4px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      transition: all 0.3s;
+    }
+    
+    .search-wrapper input:focus + .search-btn,
+    .search-btn:hover {
+      color: var(--text-main);
+      background: var(--glass-surface);
+    }
+
+    .icon-btn {
+      background: var(--surface-glass);
+      border: 1px solid var(--border-color);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      color: var(--text-main);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      transition: all 0.3s;
+      flex-shrink: 0;
+    }
+    .icon-btn:hover {
+      border-color: rgba(255, 255, 255, 0.2);
+      transform: translateY(-1px);
+    }
+
+    [data-theme="light"] .icon-btn:hover {
+      border-color: rgba(15, 23, 42, 0.18);
+    }
+
+    /* --- HERO LUXURY CARDS --- */
+    .hero-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .nav-card {
+      background: linear-gradient(145deg, var(--glass-surface) 0%, transparent 100%);
+      backdrop-filter: blur(18px) saturate(160%);
+      -webkit-backdrop-filter: blur(18px) saturate(160%);
+      border: 1px solid var(--border-color);
+      border-radius: 28px;
+      aspect-ratio: 1.4 / 1;
+      display: flex;
+      align-items: flex-end;
+      padding: 24px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* Liquid-glass specular sheen — a soft diagonal highlight, like light
+       catching the curved edge of real glass. One signature effect, reused
+       on the dock below, kept off every other surface so it stays special. */
+    .nav-card::before {
+      content: '';
+      position: absolute;
+      inset: -50% -20%;
+      background: linear-gradient(115deg,
+        transparent 38%,
+        rgba(255, 255, 255, 0.14) 47%,
+        rgba(255, 255, 255, 0.24) 50%,
+        rgba(255, 255, 255, 0.14) 53%,
+        transparent 62%);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    [data-theme="light"] .nav-card::before {
+      background: linear-gradient(115deg,
+        transparent 38%,
+        rgba(255, 255, 255, 0.45) 47%,
+        rgba(255, 255, 255, 0.65) 50%,
+        rgba(255, 255, 255, 0.45) 53%,
+        transparent 62%);
+    }
+
+    .nav-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(255,255,255,0.15);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.4);
+    }
+
+    [data-theme="light"] .nav-card:hover {
+      border-color: rgba(15, 23, 42, 0.18);
+    }
+
+    .nav-card span:not(.count-tag) {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .nav-card .count-tag {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: var(--accent-gradient);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 20px;
+      z-index: 2;
+    }
+
+    /* --- PREMIUM HORIZONTAL TABS --- */
+    .tabs-scroll {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      padding: 2px;
+    }
+    .tabs-scroll::-webkit-scrollbar { display: none; }
+
+    .tab-item {
+      padding: 10px 20px;
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 24px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      color: var(--text-muted);
+      transition: all 0.3s;
+    }
+
+    .tab-item.active {
+      background: var(--accent-gradient);
+      color: #ffffff;
+      box-shadow: 0 8px 20px rgba(var(--accent-rgb), 0.3);
+    }
+
+    /* --- PREMIUM TRACK LIST ARCHITECTURE --- */
+    .track-section-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      letter-spacing: -0.3px;
+    }
+
+    .track-list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .track-strip {
+      background: var(--surface-color);
+      border: 1px solid var(--border-color);
+      backdrop-filter: blur(30px);
+      -webkit-backdrop-filter: blur(30px);
+      border-radius: 24px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      position: relative;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .track-strip:hover {
+      background: var(--glass-surface);
+      border-color: var(--glass-border);
+    }
+
+    .track-strip.active-strip {
+      border-color: var(--accent-color);
+      background: rgba(var(--accent-rgb), 0.04);
+      box-shadow: 0 10px 30px rgba(var(--accent-rgb), 0.08);
+    }
+
+    .track-main {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      cursor: pointer;
+    }
+
+    .track-banner {
+      width: 60px;
+      height: 60px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 16px;
+      overflow: hidden;
+      flex-shrink: 0;
+      position: relative;
+    }
+
+    .track-banner img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s;
+    }
+
+    .track-details {
+      flex-grow: 1;
+      overflow: hidden;
+    }
+
+    .track-title {
+      font-size: 16px;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 4px;
+      letter-spacing: -0.2px;
+    }
+
+    .track-status {
+      font-size: 12px;
+      color: var(--accent-color);
+      font-weight: 500;
+    }
+    .track-strip:not(.active-strip) .track-status {
+      color: var(--text-muted);
+    }
+
+    .track-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .strip-control-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.2s, transform 0.2s;
+    }
+    .strip-control-btn:hover {
+      color: var(--text-main);
+    }
+    .strip-control-btn.btn-delete:hover {
+      color: var(--danger-color);
+    }
+
+    /* --- ADVANCED PROGRESS BARS --- */
+    .track-progress-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      position: relative;
+      z-index: 1;
+    }
+
+    .track-progress-bar {
+      flex-grow: 1;
+      height: 4px;
+      background: var(--glass-border);
+      border-radius: 3px;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .track-progress-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--accent-gradient);
+      border-radius: 3px;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+
+    .track-duration {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 500;
+      min-width: 35px;
+      text-align: right;
+    }
+
+    /* --- AUDIO ENGINE DOCK --- */
+    .bottom-dock {
+      position: fixed;
+      bottom: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 32px);
+      max-width: 448px;
+      background: var(--modal-surface);
+      backdrop-filter: blur(40px) saturate(180%);
+      -webkit-backdrop-filter: blur(40px) saturate(180%);
+      border: 1px solid var(--modal-border);
+      border-radius: 28px;
+      padding: 16px 20px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      z-index: 999;
+      overflow: hidden;
+    }
+
+    .bottom-dock::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.10) 0%, transparent 40%);
+      pointer-events: none;
+    }
+
+    [data-theme="light"] .bottom-dock::before {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.65) 0%, transparent 40%);
+    }
+
+    .dock-main {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      z-index: 1;
+    }
+
+    .dock-meta {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      max-width: 60%;
+    }
+
+    .dock-controls {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .dock-play-ring {
+      background: var(--accent-gradient);
+      padding: 12px;
+      border-radius: 50%;
+      color: #ffffff !important;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 15px rgba(var(--accent-rgb), 0.35);
+    }
+
+    /* --- WAVE VISUALIZER --- */
+    .wave-container {
+      display: flex;
+      align-items: flex-end;
+      gap: 3px;
+      height: 16px;
+      width: 20px;
+    }
+    .wave-bar {
+      width: 3px;
+      height: 3px;
+      background: var(--accent-color);
+      border-radius: 1.5px;
+      transition: height 0.2s;
+    }
+    .playing .wave-bar {
+      animation: bounce 0.6s ease infinite alternate;
+    }
+    .playing .wave-bar:nth-child(2) { animation-delay: 0.15s; }
+    .playing .wave-bar:nth-child(3) { animation-delay: 0.3s; }
+    
+    @keyframes bounce {
+      0% { height: 3px; }
+      100% { height: 16px; }
+    }
+
+    /* --- SYSTEM NOTIFICATIONS & CONFIG OVERLAYS --- */
+    .hidden { display: none !important; }
+
+    #youtube-player-container {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: #000;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 12px 36px rgba(0,0,0,0.5);
+    }
+    #youtube-player-container.minimized {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .settings-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(3, 0, 20, 0.4);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 20px;
+    }
+
+    .settings-content {
+      background: var(--surface-color);
+      border: 1px solid var(--border-color);
+      box-shadow: 0 30px 70px rgba(0,0,0,0.8);
+      border-radius: 32px;
+      width: 100%;
+      max-width: 380px;
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* --- MODERN ELEVATED CONFIRMATION DIALOG (10X GLASSMORPHISM MODAL) --- */
+    .delete-confirmation-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(3, 0, 20, 0.35);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2001;
+      padding: 24px;
+      animation: fadeInOverlay 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .delete-confirmation-box {
+      width: 100%;
+      max-width: 360px;
+      background: var(--modal-surface);
+      backdrop-filter: blur(30px) saturate(200%);
+      -webkit-backdrop-filter: blur(30px) saturate(200%);
+      border-radius: 28px;
+      padding: 28px;
+      text-align: center;
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4), 
+                  inset 0 1px 0 rgba(255, 255, 255, 0.12),
+                  inset 0 0 20px rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--modal-border);
+      transform: scale(0.92);
+      animation: scaleUpBox 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .delete-confirmation-box::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle at center, rgba(255, 74, 74, 0.07) 0%, transparent 65%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .delete-confirmation-box > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .delete-confirmation-box h2 {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text-main);
+      letter-spacing: -0.5px;
+      text-align: center;
+      background: var(--heading-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .delete-confirmation-box p {
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--text-muted);
+      line-height: 1.6;
+      text-align: center;
+    }
+
+    .delete-target-meta {
+      display: block;
+      font-size: 13px;
+      color: var(--glass-text);
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      background: var(--glass-surface);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      padding: 14px;
+      border-radius: 16px;
+      border: 1px solid var(--glass-border);
+      text-align: center;
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2);
+    }
+
+    .delete-modal-actions {
+      display: flex;
+      gap: 12px;
+      width: 100%;
+      margin-top: 4px;
+    }
+
+    .delete-confirm-btn {
+      flex: 1;
+      background: var(--danger-gradient);
+      color: #ffffff;
+      border: none;
+      height: 48px;
+      font-size: 14px;
+      font-weight: 700;
+      border-radius: 16px;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(255, 75, 43, 0.3);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .delete-confirm-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 28px rgba(255, 75, 43, 0.45);
+    }
+
+    .delete-cancel-lnk {
+      flex: 1;
+      background: var(--glass-surface);
+      border: 1px solid var(--glass-border);
+      color: var(--glass-text);
+      height: 48px;
+      font-size: 14px;
+      font-weight: 700;
+      border-radius: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      backdrop-filter: blur(10px);
+    }
+
+    .delete-cancel-lnk:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+    }
+
+    [data-theme="light"] .delete-cancel-lnk:hover {
+      background: rgba(15, 23, 42, 0.07);
+      border-color: rgba(15, 23, 42, 0.16);
+    }
+
+    /* --- 10X NON-DESTRUCTIVE VARIANT (used for Rename, reuses the box above exactly) --- */
+    .rename-box::before {
+      background: radial-gradient(circle at center, rgba(var(--accent-rgb), 0.08) 0%, transparent 65%);
+    }
+
+    .rename-confirm-btn {
+      background: var(--accent-gradient);
+      box-shadow: 0 8px 24px rgba(var(--accent-rgb), 0.3);
+    }
+
+    .rename-confirm-btn:hover {
+      box-shadow: 0 12px 28px rgba(var(--accent-rgb), 0.45);
+    }
+
+    @keyframes fadeInOverlay {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes scaleUpBox {
+      from { transform: scale(0.92); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .setting-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 4px 0;
+    }
+
+    .setting-row-vertical {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .setting-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-muted);
+      letter-spacing: -0.2px;
+    }
+
+    .luxury-theme-track {
+      display: flex;
+      background: var(--glass-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 4px;
+      gap: 4px;
+      width: 100%;
+    }
+
+    .luxury-theme-pill {
+      flex: 1;
+      text-align: center;
+      padding: 12px 4px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-muted);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    .luxury-theme-pill.active-pill {
+      background: var(--accent-gradient);
+      color: #ffffff;
+      box-shadow: 0 4px 15px rgba(var(--accent-rgb), 0.35);
+    }
+
+    .toast-container {
+      position: fixed;
+      top: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255, 255, 255, 0.95);
+      color: #030014;
+      padding: 12px 24px;
+      border-radius: 50px;
+      font-size: 14px;
+      font-weight: 600;
+      z-index: 2000;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    }
+
+    /* --- 10X ALBUMS OVERLAY MODAL --- */
+    .albums-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(3, 0, 20, 0.6);
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1050;
+      padding: 20px;
+      animation: fadeInOverlay 0.25s ease-out forwards;
+    }
+
+    .albums-content {
+      background: var(--modal-surface);
+      border: 1px solid var(--modal-border);
+      box-shadow: 0 35px 80px rgba(0,0,0,0.9), inset 0 1px 0 rgba(255,255,255,0.05);
+      border-radius: 32px;
+      width: 100%;
+      max-width: 420px;
+      max-height: 80vh;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .albums-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .albums-list-container {
+      overflow-y: auto;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding-right: 4px;
+    }
+
+    .albums-list-container::-webkit-scrollbar {
+      width: 4px;
+    }
+    .albums-list-container::-webkit-scrollbar-thumb {
+      background: var(--glass-border);
+      border-radius: 10px;
+    }
+
+    .album-item-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: var(--glass-surface);
+      border: 1px solid var(--glass-border);
+      padding: 10px;
+      border-radius: 16px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .album-item-row:hover {
+      background: rgba(var(--accent-rgb), 0.06);
+      border-color: rgba(var(--accent-rgb), 0.3);
+    }
+
+    .album-item-thumb {
+      width: 50px;
+      height: 50px;
+      border-radius: 10px;
+      object-fit: cover;
+      background: rgba(255,255,255,0.05);
+    }
+
+    .album-item-info {
+      flex-grow: 1;
+      overflow: hidden;
+    }
+
+    .album-item-title {
+      font-size: 14px;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .album-item-author {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .yt-badge {
+      font-size: 9px;
+      background: rgba(239, 68, 68, 0.2);
+      color: #f87171;
+      padding: 2px 6px;
+      border-radius: 6px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .loading-spinner-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 40px 0;
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+
+    .spinner {
+      width: 28px;
+      height: 28px;
+      border: 3px solid var(--glass-border);
+      border-top-color: var(--accent-color);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* --- 10X NEW GENERATION: PLAYLIST CONTEXT MODAL --- */
+    .playlist-modal-content {
+      background: var(--modal-surface);
+      border: 1px solid var(--modal-border);
+      box-shadow: 0 40px 90px rgba(0, 0, 0, 0.85);
+      border-radius: 32px;
+      width: 100%;
+      max-width: 400px;
+      padding: 26px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      animation: scaleUpBox 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .playlist-group-title {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .playlist-selector-list {
+      max-height: 200px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .playlist-selector-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--glass-surface);
+      border: 1px solid var(--glass-border);
+      padding: 12px 16px;
+      border-radius: 16px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .playlist-selector-item:hover {
+      background: rgba(var(--accent-rgb), 0.08);
+      border-color: rgba(var(--accent-rgb), 0.25);
+    }
+
+    .playlist-selector-item span {
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .playlist-input-wrapper {
+      display: flex;
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    .playlist-input-wrapper input {
+      flex-grow: 1;
+      background: var(--input-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 0 16px;
+      height: 46px;
+      color: var(--text-main);
+      font-size: 14px;
+      outline: none;
+    }
+
+    .playlist-input-wrapper input:focus {
+      border-color: var(--accent-color);
+    }
+
+    .playlist-create-btn {
+      background: var(--accent-gradient);
+      color: #ffffff;
+      border: none;
+      border-radius: 16px;
+      padding: 0 18px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(var(--accent-rgb), 0.3);
+    }
+
+    /* --- CLOUD ACCOUNT (Firebase Auth) --- */
+    .account-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--glass-surface);
+      border: 1px solid var(--glass-border);
+      border-radius: 16px;
+      padding: 12px 14px;
+    }
+
+    .account-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: var(--accent-gradient);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 15px;
+      flex-shrink: 0;
+      text-transform: uppercase;
+    }
+
+    .account-info {
+      flex-grow: 1;
+      overflow: hidden;
+    }
+
+    .account-name {
+      font-size: 14px;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .account-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 1px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .account-action-btn {
+      background: var(--accent-gradient);
+      color: #ffffff;
+      border: none;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 9px 14px;
+      border-radius: 12px;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .account-action-btn:hover { transform: translateY(-1px); }
+
+    .account-action-btn.signed-in-state {
+      background: var(--glass-surface);
+      border: 1px solid var(--glass-border);
+      color: var(--text-main);
+      box-shadow: none;
+    }
+
+    .auth-error-banner {
+      background: rgba(255, 74, 74, 0.1);
+      border: 1px solid rgba(255, 74, 74, 0.3);
+      color: var(--danger-color);
+      font-size: 13px;
+      font-weight: 500;
+      padding: 10px 14px;
+      border-radius: 12px;
+      line-height: 1.4;
+    }
+
+    .auth-input-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .auth-input {
+      width: 100%;
+      background: var(--input-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 0 16px;
+      height: 48px;
+      color: var(--text-main);
+      font-size: 14px;
+      outline: none;
+    }
+    .auth-input:focus {
+      border-color: var(--accent-color);
+    }
+
+    .auth-divider {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .auth-divider::before,
+    .auth-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--glass-border);
+    }
+
+    .auth-google-btn {
+      width: 100%;
+      height: 48px;
+      background: var(--glass-surface);
+      border: 1px solid var(--glass-border);
+      border-radius: 16px;
+      color: var(--text-main);
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .auth-google-btn:hover {
+      background: var(--input-surface);
+      transform: translateY(-1px);
+    }
+
+    .google-g-badge {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: conic-gradient(from 0deg, #4285F4 0deg 90deg, #34A853 90deg 180deg, #FBBC05 180deg 270deg, #EA4335 270deg 360deg);
+      flex-shrink: 0;
+    }
+
+    /* --- RESPONSIVE: tablet / laptop / desktop ---
+       Mobile (everything above) is untouched. Wider viewports get more
+       breathing room and the track list grows from a single column into
+       a real grid, instead of a phone layout stretched into empty space.
+       Placed at the end of the sheet on purpose: media queries don't add
+       specificity, so to win over the unconditional rules above by source
+       order, this block has to come after all of them. */
+    @media (min-width: 640px) {
+      .app-container { max-width: 640px; }
+    }
+
+    @media (min-width: 1024px) {
+      .app-container { max-width: 1080px; padding: 32px 40px; }
+
+      .input-toggle-container { justify-content: flex-end; }
+
+      .hero-cards {
+        grid-template-columns: repeat(2, 240px);
+        justify-content: flex-start;
+      }
+
+      .nav-card { aspect-ratio: unset; height: 170px; }
+
+      .track-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 16px;
+      }
+
+      .bottom-dock { max-width: 620px; }
+    }
+
+    @media (min-width: 1440px) {
+      .app-container { max-width: 1280px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    
+    <header>
+      <div class="logo-group">
+        <h1>Sonata</h1>
+      </div>
+      <div class="input-toggle-container">
+        <div class="search-wrapper">
+          <input type="text" id="yt-url-input" placeholder="Paste YouTube link...">
+          <button class="search-btn" id="btn-trigger-search">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          </button>
+        </div>
+        <button class="icon-btn" id="btn-toggle-settings">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        </button>
+      </div>
+    </header>
+
+    <div id="youtube-player-container" class="minimized">
+      <div id="iframe-target"></div>
+    </div>
+
+    <div class="hero-cards">
+      <div class="nav-card" id="card-trigger-albums">
+        <span class="count-tag" id="cnt-album">0</span>
+        <span>Albums</span>
+      </div>
+      <div class="nav-card" id="card-trigger-playlists">
+        <span class="count-tag" id="cnt-playlists">0</span>
+        <span>Playlists</span>
+      </div>
+    </div>
+
+    <div class="tabs-scroll" id="dynamic-tabs-container">
+      <div class="tab-item active" onclick="switchTab('all')" id="tab-all">All Tracks</div>
+      <div class="tab-item" onclick="switchTab('favorites')" id="tab-favorites">Favorites</div>
+    </div>
+
+    <div>
+      <div class="track-section-title" id="section-view-title">All Tracks</div>
+      <div class="track-list" id="track-container-list"></div>
+    </div>
+
+  </div>
+
+  <div class="bottom-dock" id="master-dock">
+    <div class="track-progress-container">
+      <div class="track-progress-bar" id="dock-progress-wrapper">
+        <div class="track-progress-fill" id="dock-progress-fill"></div>
+      </div>
+      <span class="track-duration" id="dock-duration-display">0:00 / 0:00</span>
+    </div>
+    <div class="dock-main">
+      <div class="dock-meta">
+        <div class="wave-container" id="dock-wave">
+          <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+        </div>
+        <div style="overflow: hidden;">
+          <div class="track-title" id="dock-title-text" style="font-size: 15px;">Select a Track</div>
+        </div>
+      </div>
+      <div class="dock-controls">
+        <button class="strip-control-btn" id="dock-btn-prev">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><polygon points="19 20 9 12 19 4 19 20"></polygon><line x1="5" y1="4" x2="5" y2="20" stroke="currentColor" stroke-width="2"></line></svg>
+        </button>
+        <button class="strip-control-btn dock-play-ring" id="dock-btn-play">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" id="dock-play-svg"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+        </button>
+        <button class="strip-control-btn" id="dock-btn-next">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 4 15 12 5 20 5 4"></polygon><line x1="19" y1="4" x2="19" y2="20" stroke="currentColor" stroke-width="2"></line></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="settings-modal hidden" id="modal-settings">
+    <div class="settings-content">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+        <h3 style="font-weight: 800; letter-spacing: -0.5px; font-size: 20px;">Control Suite</h3>
+        <button class="icon-btn" id="btn-close-settings" style="width:36px; height:36px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+      
+      <div class="setting-row-vertical">
+        <span class="setting-label">Cloud Account</span>
+        <div class="account-row" id="account-status-row">
+          <div class="account-avatar" id="account-avatar">G</div>
+          <div class="account-info">
+            <div class="account-name" id="account-name">Guest</div>
+            <div class="account-sub" id="account-sub">Saved on this device only</div>
+          </div>
+          <button class="account-action-btn" id="btn-open-auth">Sign In</button>
+        </div>
+      </div>
+
+      <div class="setting-row">
+        <span class="setting-label">Network Status</span>
+        <strong id="status-network-indicator" style="color: #10b981; font-size: 14px;">Online</strong>
+      </div>
+
+      <div class="setting-row-vertical">
+        <span class="setting-label">Render Engine Theme</span>
+        <div class="luxury-theme-track" id="theme-pill-track">
+          <div class="luxury-theme-pill active-pill" data-theme-val="deep">Obsidian</div>
+          <div class="luxury-theme-pill" data-theme-val="oled">OLED</div>
+          <div class="luxury-theme-pill" data-theme-val="light">Light</div>
+          <div class="luxury-theme-pill" data-theme-val="green">Emerald</div>
+        </div>
+      </div>
+
+      <div class="setting-row">
+        <span class="setting-label">Visual Display Module</span>
+        <button class="icon-btn" id="btn-toggle-video" style="color: var(--accent-color); width:36px; height:36px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="eye-icon-svg"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="settings-modal hidden" id="modal-auth">
+    <div class="playlist-modal-content">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <h3 style="font-weight: 800; font-size: 20px; letter-spacing: -0.5px;">Your Account</h3>
+          <p style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Sync your library across every device</p>
+        </div>
+        <button class="icon-btn" id="btn-close-auth" style="width:36px; height:36px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+
+      <div class="luxury-theme-track" id="auth-tab-switcher">
+        <div class="luxury-theme-pill active-pill" data-auth-tab="signin">Sign In</div>
+        <div class="luxury-theme-pill" data-auth-tab="signup">Create Account</div>
+      </div>
+
+      <div class="auth-error-banner hidden" id="auth-error-banner"></div>
+
+      <div class="auth-input-stack">
+        <input type="email" class="auth-input" id="input-auth-email" placeholder="Email address" autocomplete="email">
+        <input type="password" class="auth-input" id="input-auth-password" placeholder="Password (min 6 characters)" autocomplete="current-password">
+      </div>
+
+      <button class="playlist-create-btn" id="btn-auth-submit" style="width: 100%; height: 48px; font-size: 15px;">Sign In</button>
+
+      <div class="auth-divider"><span>or</span></div>
+
+      <button class="auth-google-btn" id="btn-auth-google">
+        <span class="google-g-badge"></span>
+        Continue with Google
+      </button>
+
+      <p style="font-size: 11px; color: var(--text-muted); text-align: center; margin-top: 4px;" id="auth-guest-note">
+        Using Sonata as a guest — your library is private to this device until you sign in.
+      </p>
+    </div>
+  </div>
+
+  <div class="delete-confirmation-modal hidden" id="modal-delete-confirm">
+    <div class="delete-confirmation-box">
+      <h2 id="delete-modal-heading">Remove Track</h2>
+      <p id="delete-modal-message">Are you sure you want to permanently detach this asset from your local streaming workspace?</p>
+      <span class="delete-target-meta" id="lbl-delete-target-title">Track Name</span>
+      <div class="delete-modal-actions">
+        <div class="delete-cancel-lnk" id="btn-cancel-delete-close">Cancel</div>
+        <button class="delete-confirm-btn" id="btn-confirm-delete-execute">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="delete-confirmation-modal hidden" id="modal-rename-playlist">
+    <div class="delete-confirmation-box rename-box">
+      <h2>Rename Playlist</h2>
+      <p>Choose a new name for this playlist.</p>
+      <div class="playlist-input-wrapper" style="margin-top:0;">
+        <input type="text" id="input-rename-playlist-name" placeholder="Playlist title..." maxlength="60" autocomplete="off" spellcheck="false">
+      </div>
+      <div class="delete-modal-actions">
+        <div class="delete-cancel-lnk" id="btn-cancel-rename-close">Cancel</div>
+        <button class="delete-confirm-btn rename-confirm-btn" id="btn-confirm-rename-execute">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="albums-modal hidden" id="modal-youtube-albums">
+    <div class="albums-content">
+      <div class="albums-header">
+        <div>
+          <h3 style="font-weight: 800; font-size: 19px; letter-spacing: -0.5px;">YouTube Album</h3>
+          <p style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Select items to append into system</p>
+        </div>
+        <button class="icon-btn" id="btn-close-albums" style="width:36px; height:36px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+      <div class="albums-list-container" id="albums-ajax-payload-target"></div>
+    </div>
+  </div>
+
+  <div class="settings-modal hidden" id="modal-playlist-orchestrator">
+    <div class="playlist-modal-content">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <h3 style="font-weight: 800; font-size: 20px; letter-spacing: -0.5px;">Playlist Control</h3>
+          <p style="font-size: 12px; color: var(--text-muted); margin-top: 2px;" id="playlist-modal-subtitle">Manage track localization</p>
+        </div>
+        <button class="icon-btn" id="btn-close-playlists-modal" style="width:36px; height:36px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+
+      <div>
+        <div class="playlist-group-title">Add to Playlist</div>
+        <div class="playlist-selector-list" id="modal-playlists-target-list"></div>
+      </div>
+
+      <div style="border-top: 1px solid var(--border-color); padding-top: 16px;">
+        <div class="playlist-group-title">Create New Playlist</div>
+        <div class="playlist-input-wrapper">
+          <input type="text" id="input-new-playlist-name" placeholder="Enter playlist title...">
+          <button class="playlist-create-btn" id="btn-execute-create-playlist">Create</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="settings-modal hidden" id="modal-playlists-dashboard">
+    <div class="playlist-modal-content">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <h3 style="font-weight: 800; font-size: 20px; letter-spacing: -0.5px;">Playlists Vault</h3>
+          <p style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Select, rename, or delete your spaces</p>
+        </div>
+        <button class="icon-btn" id="btn-close-playlists-dashboard" style="width:36px; height:36px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+
+      <div>
+        <div class="playlist-group-title">Your Playlists</div>
+        <div class="playlist-selector-list" id="dashboard-playlists-target-list"></div>
+      </div>
+
+      <div style="border-top: 1px solid var(--border-color); padding-top: 16px;">
+        <div class="playlist-group-title">Create New Playlist</div>
+        <div class="playlist-input-wrapper">
+          <input type="text" id="input-dashboard-playlist-name" placeholder="Enter playlist title...">
+          <button class="playlist-create-btn" id="btn-dashboard-create-playlist">Create</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // System Configurations Injectors
+    const YOUTUBE_API_KEY = "AIzaSyA58g8LJy4f_TiLuv-w61c8vEkq0TJnKhw";
+    const TARGET_PLAYLIST_ID = "PLWOkRO8ClsKo";
+
+    let trackLibrary = JSON.parse(localStorage.getItem('sonata_library'));
+    if(!trackLibrary || trackLibrary.length === 0) {
+      trackLibrary = [
+        { id: "bMknfKXIFA8", title: "MAIBA ACTING", type: "online", favorite: true },
+        { id: "7K_ZOdFv7p8", title: "I Tried Video Editing for 365 days and...", type: "online", favorite: false }
+      ];
+      localStorage.setItem('sonata_library', JSON.stringify(trackLibrary));
+    }
+
+    // Normalized Playlist Storage Module Initialization
+    let playlistLibrary = JSON.parse(localStorage.getItem('sonata_playlists'));
+    if(!playlistLibrary) {
+      playlistLibrary = [
+        { id: "pl-initial-vibe", name: "Lo-Fi Gaming", tracks: ["bMknfKXIFA8"] }
+      ];
+      localStorage.setItem('sonata_playlists', JSON.stringify(playlistLibrary));
+    }
+
+    let currentTabIndex = 'all'; 
+    let activeQueue = [];
+    let activeQueuePointer = -1;
+    let ytPlayer = null;
+    let ytApiReady = false;
+    let timelineUpdateInterval = null;
+    let isVideoVisible = false;
+    let deleteContext = null;        // { type: 'track' | 'playlist', id }
+    let trackTargetedForPlaylist = null;
+    let renameContext = null;        // { playlistId }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      setupDomListeners();
+      setupCloudEventBridge();
+      applyTheme(localStorage.getItem('sonata_theme') || 'deep');
+      renderAppMetrics();
+      reconstructTabEngineBars();
+      renderTracksDashboard();
+      initNetworkAgent();
+      registerServiceWorker();
+    });
+
+    // Theme color shown in the OS status bar / browser chrome per theme, so it
+    // never looks like a mismatched dark bar sitting on top of a light page.
+    const THEME_CHROME_COLOR = {
+      deep: '#030014',
+      oled: '#000000',
+      light: '#f8fafc',
+      green: '#01120c'
+    };
+
+    function applyTheme(themeVal) {
+      if (themeVal === 'deep') {
+        document.documentElement.removeAttribute('data-theme');
+      } else {
+        document.documentElement.setAttribute('data-theme', themeVal);
+      }
+
+      localStorage.setItem('sonata_theme', themeVal);
+
+      document.querySelectorAll('#theme-pill-track .luxury-theme-pill').forEach(pill => {
+        pill.classList.toggle('active-pill', pill.getAttribute('data-theme-val') === themeVal);
+      });
+
+      const metaThemeColor = document.getElementById('meta-theme-color');
+      if (metaThemeColor) {
+        metaThemeColor.setAttribute('content', THEME_CHROME_COLOR[themeVal] || THEME_CHROME_COLOR.deep);
+      }
+    }
+
+    function registerServiceWorker() {
+      if (!('serviceWorker' in navigator)) return;
+      navigator.serviceWorker.register('./sw.js').catch((err) => {
+        console.warn('Service worker registration failed:', err);
+      });
+    }
+
+    // --- CLOUD SYNC BRIDGE ---
+    // window.SonataCloud is defined by the Firebase module script at the
+    // bottom of the page. Everything here is written defensively: if Firebase
+    // isn't configured yet (placeholder config) or the network call fails,
+    // the app keeps working exactly as it did with localStorage alone —
+    // cloud sync is an enhancement, never a dependency.
+
+    let authModalMode = 'signin';
+
+    function syncToCloud(fn) {
+      if (!window.SonataCloud) return;
+      try {
+        const result = fn();
+        if (result && typeof result.catch === 'function') {
+          result.catch((err) => console.warn('Cloud sync skipped:', err && err.message));
+        }
+      } catch (err) {
+        console.warn('Cloud sync skipped:', err && err.message);
+      }
+    }
+
+    function setupCloudEventBridge() {
+      document.addEventListener('sonata-auth-changed', (e) => updateAccountUI(e.detail));
+      document.addEventListener('sonata-auth-error', (e) => {
+        console.warn('Cloud auth error:', e.detail && e.detail.message);
+      });
+      document.addEventListener('sonata-tracks-changed', (e) => mergeCloudTracks(e.detail.tracks));
+      document.addEventListener('sonata-playlists-changed', (e) => mergeCloudPlaylists(e.detail.playlists));
+    }
+
+    function mergeCloudTracks(cloudTracks) {
+      if (!Array.isArray(cloudTracks)) return;
+      trackLibrary = cloudTracks;
+      localStorage.setItem('sonata_library', JSON.stringify(trackLibrary));
+      renderAppMetrics();
+      renderTracksDashboard();
+    }
+
+    function mergeCloudPlaylists(cloudPlaylists) {
+      if (!Array.isArray(cloudPlaylists)) return;
+      playlistLibrary = cloudPlaylists.map(p => ({
+        id: p.id,
+        name: p.name,
+        tracks: p.trackIds || []
+      }));
+      localStorage.setItem('sonata_playlists', JSON.stringify(playlistLibrary));
+      renderAppMetrics();
+      renderTracksDashboard();
+      if (!document.getElementById('modal-playlists-dashboard').classList.contains('hidden')) {
+        renderPlaylistsDashboardModal();
+      }
+    }
+
+    function updateAccountUI(detail) {
+      const avatar = document.getElementById('account-avatar');
+      const name = document.getElementById('account-name');
+      const sub = document.getElementById('account-sub');
+      const btn = document.getElementById('btn-open-auth');
+      if (!avatar || !name || !sub || !btn) return;
+
+      if (!detail || !detail.uid || detail.isAnonymous) {
+        avatar.textContent = 'G';
+        name.textContent = 'Guest';
+        sub.textContent = 'Saved on this device only';
+        btn.textContent = 'Sign In';
+        btn.classList.remove('signed-in-state');
+      } else {
+        const label = detail.email || 'Signed in';
+        avatar.textContent = label.charAt(0);
+        name.textContent = label;
+        sub.textContent = 'Synced to the cloud';
+        btn.textContent = 'Sign Out';
+        btn.classList.add('signed-in-state');
+      }
+    }
+
+    function showAuthError(message) {
+      const banner = document.getElementById('auth-error-banner');
+      banner.textContent = message;
+      banner.classList.remove('hidden');
+    }
+
+    function clearAuthError() {
+      document.getElementById('auth-error-banner').classList.add('hidden');
+    }
+
+    function openAuthModal() {
+      clearAuthError();
+      document.getElementById('input-auth-password').value = '';
+      document.getElementById('modal-auth').classList.remove('hidden');
+    }
+
+    function closeAuthModal() {
+      document.getElementById('modal-auth').classList.add('hidden');
+    }
+
+    function setAuthModalMode(mode) {
+      authModalMode = mode;
+      document.querySelectorAll('#auth-tab-switcher .luxury-theme-pill').forEach(pill => {
+        pill.classList.toggle('active-pill', pill.getAttribute('data-auth-tab') === mode);
+      });
+      const submitBtn = document.getElementById('btn-auth-submit');
+      submitBtn.textContent = mode === 'signup' ? 'Create Account' : 'Sign In';
+      clearAuthError();
+    }
+
+    function setupAccountAndAuthListeners() {
+      document.getElementById('btn-open-auth').addEventListener('click', () => {
+        const user = window.SonataCloud && window.SonataCloud.getUser();
+        if (user && !user.isAnonymous) {
+          window.SonataCloud.signOutUser()
+            .then(() => triggerSystemToast('Signed out — back to guest mode'))
+            .catch(() => triggerSystemToast('Sign out failed'));
+        } else {
+          setAuthModalMode('signin');
+          openAuthModal();
+        }
+      });
+
+      document.getElementById('btn-close-auth').addEventListener('click', closeAuthModal);
+
+      document.querySelectorAll('#auth-tab-switcher .luxury-theme-pill').forEach(pill => {
+        pill.addEventListener('click', (e) => {
+          setAuthModalMode(e.currentTarget.getAttribute('data-auth-tab'));
+        });
+      });
+
+      document.getElementById('btn-auth-submit').addEventListener('click', handleAuthSubmit);
+      document.getElementById('input-auth-password').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') handleAuthSubmit();
+      });
+
+      document.getElementById('btn-auth-google').addEventListener('click', () => {
+        if (!window.SonataCloud) return;
+        clearAuthError();
+        window.SonataCloud.signInWithGoogle()
+          .then(() => {
+            closeAuthModal();
+            triggerSystemToast('Signed in with Google');
+          })
+          .catch((err) => showAuthError(humanizeAuthError(err)));
+      });
+    }
+
+    function handleAuthSubmit() {
+      if (!window.SonataCloud) {
+        showAuthError("Cloud isn't configured yet — ask your developer to add the Firebase config.");
+        return;
+      }
+
+      const email = document.getElementById('input-auth-email').value.trim();
+      const password = document.getElementById('input-auth-password').value;
+      clearAuthError();
+
+      if (!email || !password) {
+        showAuthError('Enter both an email and a password.');
+        return;
+      }
+
+      const action = authModalMode === 'signup'
+        ? window.SonataCloud.signUpWithEmail(email, password)
+        : window.SonataCloud.signInWithEmail(email, password);
+
+      action
+        .then(() => {
+          closeAuthModal();
+          triggerSystemToast(authModalMode === 'signup' ? 'Account created' : 'Signed in');
+        })
+        .catch((err) => showAuthError(humanizeAuthError(err)));
+    }
+
+    function humanizeAuthError(err) {
+      const code = err && err.code ? err.code : '';
+      if (code.includes('email-already-in-use')) return 'That email already has an account — try signing in instead.';
+      if (code.includes('invalid-email')) return 'That email address looks invalid.';
+      if (code.includes('weak-password')) return 'Password should be at least 6 characters.';
+      if (code.includes('wrong-password') || code.includes('invalid-credential')) return 'Incorrect email or password.';
+      if (code.includes('user-not-found')) return "No account found with that email — try Create Account.";
+      if (code.includes('popup-closed-by-user')) return 'Google sign-in was closed before finishing.';
+      if (code.includes('network-request-failed')) return "Couldn't reach the cloud — check your connection.";
+      return (err && err.message) || 'Something went wrong. Please try again.';
+    }
+
+    const tag = document.createElement('script');
+    tag.src = "https://www.youtube.com/iframe_api";
+    document.getElementsByTagName('script')[0].parentNode.insertBefore(tag, document.getElementsByTagName('script')[0]);
+
+    function onYouTubeIframeAPIReady() {
+      ytApiReady = true;
+    }
+
+    function setupDomListeners() {
+      const urlInput = document.getElementById('yt-url-input');
+
+      document.getElementById('btn-trigger-search').addEventListener('click', () => {
+        if(urlInput.value.trim() !== "") {
+          parseAndCommitYoutubeUrl(urlInput.value.trim());
+          urlInput.value = "";
+        }
+      });
+
+      urlInput.addEventListener('keydown', (e) => {
+        if(e.key === 'Enter' && urlInput.value.trim() !== "") {
+          parseAndCommitYoutubeUrl(urlInput.value.trim());
+          urlInput.value = "";
+        }
+      });
+
+      document.getElementById('btn-toggle-settings').addEventListener('click', () => {
+        document.getElementById('modal-settings').classList.remove('hidden');
+      });
+      document.getElementById('btn-close-settings').addEventListener('click', () => {
+        document.getElementById('modal-settings').classList.add('hidden');
+      });
+
+      // Playlist Modals Setup Execution
+      document.getElementById('btn-close-playlists-modal').addEventListener('click', () => {
+        document.getElementById('modal-playlist-orchestrator').classList.add('hidden');
+        trackTargetedForPlaylist = null;
+      });
+
+      document.getElementById('btn-execute-create-playlist').addEventListener('click', executePlaylistGenerationWorkflow);
+      document.getElementById('input-new-playlist-name').addEventListener('keydown', (e) => {
+        if(e.key === 'Enter') executePlaylistGenerationWorkflow();
+      });
+
+      // Trigger Playlists Vault Dashboard Modal
+      document.getElementById('card-trigger-playlists').addEventListener('click', () => {
+        renderPlaylistsDashboardModal();
+        document.getElementById('modal-playlists-dashboard').classList.remove('hidden');
+      });
+      
+      document.getElementById('btn-close-playlists-dashboard').addEventListener('click', () => {
+        document.getElementById('modal-playlists-dashboard').classList.add('hidden');
+      });
+
+      document.getElementById('btn-dashboard-create-playlist').addEventListener('click', executeDashboardPlaylistGenerationWorkflow);
+      document.getElementById('input-dashboard-playlist-name').addEventListener('keydown', (e) => {
+        if(e.key === 'Enter') executeDashboardPlaylistGenerationWorkflow();
+      });
+
+      document.getElementById('card-trigger-albums').addEventListener('click', openYoutubeAlbumsModal);
+      document.getElementById('btn-close-albums').addEventListener('click', closeYoutubeAlbumsModal);
+
+      // 10X Unified Delete Confirmation (replaces window.confirm for tracks AND playlists)
+      document.getElementById('btn-cancel-delete-close').addEventListener('click', closeDeleteConfirmationModal);
+      document.getElementById('btn-confirm-delete-execute').addEventListener('click', executeDeletionConfirmed);
+
+      // 10X Rename Modal (replaces window.prompt for playlist renaming)
+      document.getElementById('btn-cancel-rename-close').addEventListener('click', closeRenameModal);
+      document.getElementById('btn-confirm-rename-execute').addEventListener('click', executeRenameConfirmed);
+      document.getElementById('input-rename-playlist-name').addEventListener('keydown', (e) => {
+        if(e.key === 'Enter') executeRenameConfirmed();
+        if(e.key === 'Escape') closeRenameModal();
+      });
+
+      // Global Escape handling for modals without a focused input to catch the key
+      document.addEventListener('keydown', (e) => {
+        if(e.key !== 'Escape') return;
+        if(!document.getElementById('modal-delete-confirm').classList.contains('hidden')) {
+          closeDeleteConfirmationModal();
+        }
+      });
+
+      document.querySelectorAll('#theme-pill-track .luxury-theme-pill').forEach(pill => {
+        pill.addEventListener('click', (e) => {
+          const selectedTheme = e.currentTarget.getAttribute('data-theme-val');
+          applyTheme(selectedTheme);
+        });
+      });
+
+      setupAccountAndAuthListeners();
+
+      document.getElementById('btn-toggle-video').addEventListener('click', () => {
+        isVideoVisible = !isVideoVisible;
+        const playerContainer = document.getElementById('youtube-player-container');
+        const svgIcon = document.getElementById('eye-icon-svg');
+        if(isVideoVisible) {
+          playerContainer.classList.remove('minimized');
+          svgIcon.innerHTML = `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>`;
+        } else {
+          playerContainer.classList.add('minimized');
+          svgIcon.innerHTML = `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>`;
+        }
+      });
+
+      document.getElementById('dock-btn-play').addEventListener('click', togglePlaybackState);
+      document.getElementById('dock-btn-next').addEventListener('click', executeNextTrackTrackWrap);
+      document.getElementById('dock-btn-prev').addEventListener('click', executePrevTrackTrackWrap);
+
+      document.getElementById('dock-progress-wrapper').addEventListener('click', (e) => {
+        const rect = e.currentTarget.getBoundingClientRect();
+        const ratio = (e.clientX - rect.left) / rect.width;
+        seekToAudioRatioPosition(ratio);
+      });
+    }
+
+    async function openYoutubeAlbumsModal() {
+      const container = document.getElementById('albums-ajax-payload-target');
+      document.getElementById('modal-youtube-albums').classList.remove('hidden');
+      
+      container.innerHTML = `
+        <div class="loading-spinner-wrapper">
+          <div class="spinner"></div>
+          <p>Syncing with YouTube Engine...</p>
+        </div>
+      `;
+
+      try {
+        const url = `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=25&playlistId=${TARGET_PLAYLIST_ID}&key=${YOUTUBE_API_KEY}`;
+        const response = await fetch(url);
+        if (!response.ok) throw new Error("API Channel handshake failed");
+        const data = await response.json();
+        renderAlbumsModalData(data.items);
+      } catch (error) {
+        console.error(error);
+        container.innerHTML = `
+          <div style="color:var(--danger-color); text-align:center; font-size:13px; padding:20px 10px; font-weight:600;">
+            Engine Failed to fetch YouTube stream. Verify API Key limits or connection setup.
+          </div>
+        `;
+      }
+    }
+
+    function closeYoutubeAlbumsModal() {
+      document.getElementById('modal-youtube-albums').classList.add('hidden');
+    }
+
+    function renderAlbumsModalData(items) {
+      const container = document.getElementById('albums-ajax-payload-target');
+      if (!items || items.length === 0) {
+        container.innerHTML = `<div style="color:var(--text-muted); text-align:center; font-size:13px; padding:25px;">No albums elements verified inside target location.</div>`;
+        return;
+      }
+      container.innerHTML = "";
+      
+      items.forEach(item => {
+        const snippet = item.snippet;
+        const videoId = snippet.resourceId ? snippet.resourceId.videoId : null;
+        if (!videoId) return;
+
+        const title = snippet.title || "Private Video Asset";
+        const author = snippet.videoOwnerChannelTitle || snippet.channelTitle || "Unknown Artist";
+        const thumb = snippet.thumbnails && snippet.thumbnails.default ? snippet.thumbnails.default.url : 'https://img.youtube.com/vi/' + videoId + '/default.jpg';
+
+        const row = document.createElement('div');
+        row.className = 'album-item-row';
+        row.setAttribute('onclick', `directInjectTrackFromAlbum('${videoId}', \`${escapeStringLiteral(title)}\`)`);
+        
+        row.innerHTML = `
+          <img src="${thumb}" class="album-item-thumb" alt="Cover">
+          <div class="album-item-info">
+            <div class="album-item-title">${title}</div>
+            <div class="album-item-author">${author}</div>
+          </div>
+          <div class="yt-badge">Link</div>
+        `;
+        container.appendChild(row);
+      });
+    }
+
+    function directInjectTrackFromAlbum(videoId, trackTitle) {
+      if(trackLibrary.some(t => t.id === videoId)) {
+        triggerSystemToast("Track already registered in system core");
+        closeYoutubeAlbumsModal();
+        bootstrapSelectedTrack(videoId);
+        return;
+      }
+
+      const injectedAsset = { id: videoId, title: trackTitle, type: 'online', favorite: false };
+      trackLibrary.push(injectedAsset);
+      localStorage.setItem('sonata_library', JSON.stringify(trackLibrary));
+      syncToCloud(() => window.SonataCloud.saveTrack(injectedAsset));
+      
+      triggerSystemToast("Asset Synced Successfully");
+      closeYoutubeAlbumsModal();
+      renderAppMetrics();
+      renderTracksDashboard();
+      bootstrapSelectedTrack(videoId);
+    }
+
+    function escapeStringLiteral(str) {
+      return str.replace(/`/g, '\\`').replace(/"/g, '&quot;').replace(/'/g, "\\'");
+    }
+
+    function parseAndCommitYoutubeUrl(url) {
+      const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|shorts\/)([^#\&\?]*).*/;
+      const match = url.match(regExp);
+      const videoId = (match && match[2].length === 11) ? match[2] : null;
+
+      if(!videoId) {
+        triggerSystemToast("Invalid Link Location");
+        return;
+      }
+      if(trackLibrary.some(t => t.id === videoId)) {
+        triggerSystemToast("Track already inside system library");
+        return;
+      }
+
+      const newTrack = { id: videoId, title: "Fetching Premium Video Stream...", type: 'online', favorite: false };
+      trackLibrary.push(newTrack);
+      localStorage.setItem('sonata_library', JSON.stringify(trackLibrary));
+      syncToCloud(() => window.SonataCloud.saveTrack(newTrack));
+      triggerSystemToast("Network stream linked to engine");
+      renderAppMetrics();
+      renderTracksDashboard();
+    }
+
+    function renderAppMetrics() {
+      document.getElementById('cnt-album').innerText = "1";
+      document.getElementById('cnt-playlists').innerText = playlistLibrary.length;
+    }
+
+    function reconstructTabEngineBars() {
+      const tabsContainer = document.getElementById('dynamic-tabs-container');
+      tabsContainer.innerHTML = `
+        <div class="tab-item ${currentTabIndex === 'all' ? 'active' : ''}" onclick="switchTab('all')" id="tab-all">All Tracks</div>
+        <div class="tab-item ${currentTabIndex === 'favorites' ? 'active' : ''}" onclick="switchTab('favorites')" id="tab-favorites">Favorites</div>
+      `;
+    }
+
+    function renderPlaylistsDashboardModal() {
+      const targetList = document.getElementById('dashboard-playlists-target-list');
+      targetList.innerHTML = "";
+      
+      if(playlistLibrary.length === 0) {
+        targetList.innerHTML = `<div style="color:var(--text-muted); font-size:13px; text-align:center; padding:12px;">No active structural playlists configured.</div>`;
+        return;
+      }
+
+      playlistLibrary.forEach(p => {
+        const row = document.createElement('div');
+        row.className = "playlist-selector-item";
+        row.style.display = "flex";
+        row.style.justifyContent = "space-between";
+        row.style.alignItems = "center";
+        
+        row.innerHTML = `
+          <div style="flex-grow:1; display:flex; flex-direction:column; cursor:pointer;" onclick="selectPlaylistFromDashboard('${p.id}')">
+            <span>${p.name}</span>
+            <span style="font-size:11px; color:var(--text-muted); margin-top:2px;">${p.tracks.length} Tracks</span>
+          </div>
+          <div style="display:flex; gap:10px;" onclick="event.stopPropagation();">
+            <button class="strip-control-btn" onclick="renamePlaylistWorkflow('${p.id}')" title="Rename Playlist" style="color: var(--accent-color);">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+            </button>
+            <button class="strip-control-btn btn-delete" onclick="deletePlaylistWorkflow('${p.id}')" title="Delete Playlist">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+            </button>
+          </div>
+        `;
+        targetList.appendChild(row);
+      });
+    }
+
+    function selectPlaylistFromDashboard(playlistId) {
+      document.getElementById('modal-playlists-dashboard').classList.add('hidden');
+      switchTab(`playlist-${playlistId}`);
+    }
+
+    // 10X: replaces window.prompt() with the in-system glassmorphism rename modal
+    function renamePlaylistWorkflow(playlistId) {
+      const playlist = playlistLibrary.find(p => p.id === playlistId);
+      if(!playlist) return;
+
+      renameContext = { playlistId };
+
+      const input = document.getElementById('input-rename-playlist-name');
+      input.value = playlist.name;
+      document.getElementById('modal-rename-playlist').classList.remove('hidden');
+
+      requestAnimationFrame(() => {
+        input.focus();
+        input.select();
+      });
+    }
+
+    function closeRenameModal() {
+      renameContext = null;
+      document.getElementById('modal-rename-playlist').classList.add('hidden');
+    }
+
+    function executeRenameConfirmed() {
+      if(!renameContext) return;
+
+      const playlist = playlistLibrary.find(p => p.id === renameContext.playlistId);
+      if(!playlist) { closeRenameModal(); return; }
+
+      const input = document.getElementById('input-rename-playlist-name');
+      const newName = input.value.trim();
+
+      if(!newName) {
+        triggerSystemToast("Playlist name can't be empty");
+        input.focus();
+        return;
+      }
+      if(newName.length > 60) {
+        triggerSystemToast("Playlist name is too long");
+        return;
+      }
+      if(newName === playlist.name) {
+        closeRenameModal();
+        return;
+      }
+
+      playlist.name = newName;
+      localStorage.setItem('sonata_playlists', JSON.stringify(playlistLibrary));
+      syncToCloud(() => window.SonataCloud.savePlaylist(playlist));
+      triggerSystemToast("Playlist renamed successfully");
+      renderPlaylistsDashboardModal();
+
+      if(currentTabIndex === `playlist-${playlist.id}`) {
+        document.getElementById('section-view-title').innerText = playlist.name;
+      }
+
+      closeRenameModal();
+    }
+
+    // 10X: replaces window.confirm() — same modal now powers both track AND playlist deletion
+    function deletePlaylistWorkflow(playlistId) {
+      const playlist = playlistLibrary.find(p => p.id === playlistId);
+      if(!playlist) return;
+
+      deleteContext = { type: 'playlist', id: playlistId };
+      presentDeleteConfirmationModal({
+        heading: 'Delete Playlist',
+        message: 'This will permanently retire this playlist from your workspace. Tracks inside it stay safe in your library.',
+        targetLabel: playlist.name
+      });
+    }
+
+    function executeDashboardPlaylistGenerationWorkflow() {
+      const input = document.getElementById('input-dashboard-playlist-name');
+      const name = input.value.trim();
+      if(!name) { triggerSystemToast("Name context assignment required"); return; }
+
+      const newPlaylist = {
+        id: 'pl-' + Date.now(),
+        name: name,
+        tracks: []
+      };
+
+      playlistLibrary.push(newPlaylist);
+      localStorage.setItem('sonata_playlists', JSON.stringify(playlistLibrary));
+      syncToCloud(() => window.SonataCloud.savePlaylist(newPlaylist));
+      input.value = "";
+      
+      triggerSystemToast(`Playlist "${name}" initialized`);
+      renderAppMetrics();
+      renderPlaylistsDashboardModal();
+      renderTracksDashboard();
+    }
+
+    function initNetworkAgent() {
+      const indicator = document.getElementById('status-network-indicator');
+      const applyStatus = () => {
+        if(navigator.onLine) {
+          indicator.innerText = "Online Core Access";
+          indicator.style.color = "#10b981";
+        } else {
+          indicator.innerText = "Isolated Offline Core";
+          indicator.style.color = "#ef4444";
+        }
+      };
+      window.addEventListener('online', applyStatus);
+      window.addEventListener('offline', applyStatus);
+      applyStatus();
+    }
+
+    function switchTab(targetTab) {
+      currentTabIndex = targetTab;
+      document.querySelectorAll('.tab-item').forEach(el => el.classList.remove('active'));
+      const selectedTabEl = document.getElementById(`tab-${targetTab}`);
+      if(selectedTabEl) selectedTabEl.classList.add('active');
+
+      if(targetTab === 'all') {
+        document.getElementById('section-view-title').innerText = "All Tracks";
+      } else if(targetTab === 'favorites') {
+        document.getElementById('section-view-title').innerText = "Favorites Tracks";
+      } else if(targetTab.startsWith('playlist-')) {
+        const id = targetTab.replace('playlist-', '');
+        const targetPlaylist = playlistLibrary.find(p => p.id === id);
+        document.getElementById('section-view-title').innerText = targetPlaylist ? `${targetPlaylist.name}` : "Playlist View";
+      }
+      renderTracksDashboard();
+    }
+
+    function renderTracksDashboard() {
+      const container = document.getElementById('track-container-list');
+      if (!container) return;
+      container.innerHTML = "";
+      let filteringSubset = [];
+
+      if (currentTabIndex === 'all') {
+        filteringSubset = [...trackLibrary];
+      } else if (currentTabIndex === 'favorites') {
+        filteringSubset = [...trackLibrary].filter(t => t.favorite);
+      } else if (currentTabIndex.startsWith('playlist-')) {
+        const pId = currentTabIndex.replace('playlist-', '');
+        const activePlaylistNode = playlistLibrary.find(p => p.id === pId);
+        if(activePlaylistNode) {
+          filteringSubset = trackLibrary.filter(track => activePlaylistNode.tracks.includes(track.id));
+        }
+      }
+
+      if(filteringSubset.length === 0) {
+        container.innerHTML = `<div style="color:var(--text-muted); font-size:14px; padding:10px;">Index workspace empty.</div>`;
+        return;
+      }
+      
+      filteringSubset.forEach(track => { container.appendChild(createTrackStripNode(track)); });
+    }
+
+    // Dynamic Playlist Context Architecture
+    function openPlaylistInterfacingPipeline(trackId) {
+      trackTargetedForPlaylist = trackId;
+      const trackObj = trackLibrary.find(t => t.id === trackId);
+      if(trackObj) {
+        document.getElementById('playlist-modal-subtitle').innerText = `Mapping: "${trackObj.title}"`;
+      }
+      
+      const targetList = document.getElementById('modal-playlists-target-list');
+      targetList.innerHTML = "";
+      
+      if(playlistLibrary.length === 0) {
+        targetList.innerHTML = `<div style="color:var(--text-muted); font-size:13px; text-align:center; padding:12px;">No active structural playlists configured.</div>`;
+      } else {
+        playlistLibrary.forEach(p => {
+          const holdsTrack = p.tracks.includes(trackId);
+          const row = document.createElement('div');
+          row.className = "playlist-selector-item";
+          row.onclick = () => toggleTrackPlaylistMapping(p.id, trackId);
+          row.innerHTML = `
+            <span>${p.name}</span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="${holdsTrack ? 'var(--accent-color)' : 'none'}" stroke="${holdsTrack ? 'var(--accent-color)' : 'var(--text-muted)'}" stroke-width="2.5">
+              ${holdsTrack ? `<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline>` : `<circle cx="12" cy="12" r="10"></circle>`}
+            </svg>
+          `;
+          targetList.appendChild(row);
+        });
+      }
+
+      document.getElementById('modal-playlist-orchestrator').classList.remove('hidden');
+    }
+
+    function toggleTrackPlaylistMapping(playlistId, trackId) {
+      const playlist = playlistLibrary.find(p => p.id === playlistId);
+      if(!playlist) return;
+
+      const positionIdx = playlist.tracks.indexOf(trackId);
+      if(positionIdx > -1) {
+        playlist.tracks.splice(positionIdx, 1);
+        triggerSystemToast("Asset detached from playlist");
+      } else {
+        playlist.tracks.push(trackId);
+        triggerSystemToast("Asset dynamically mapped to playlist");
+      }
+
+      localStorage.setItem('sonata_playlists', JSON.stringify(playlistLibrary));
+      syncToCloud(() => window.SonataCloud.savePlaylist(playlist));
+      openPlaylistInterfacingPipeline(trackId); // Trigger Reactive Re-render
+      renderTracksDashboard();
+    }
+
+    function executePlaylistGenerationWorkflow() {
+      const input = document.getElementById('input-new-playlist-name');
+      const name = input.value.trim();
+      if(!name) { triggerSystemToast("Name context assignment required"); return; }
+
+      const newPlaylist = {
+        id: 'pl-' + Date.now(),
+        name: name,
+        tracks: trackTargetedForPlaylist ? [trackTargetedForPlaylist] : []
+      };
+
+      playlistLibrary.push(newPlaylist);
+      localStorage.setItem('sonata_playlists', JSON.stringify(playlistLibrary));
+      syncToCloud(() => window.SonataCloud.savePlaylist(newPlaylist));
+      input.value = "";
+      
+      triggerSystemToast(`Playlist "${name}" initialized`);
+      renderAppMetrics();
+      
+      if(trackTargetedForPlaylist) {
+        openPlaylistInterfacingPipeline(trackTargetedForPlaylist);
+      } else {
+        document.getElementById('modal-playlist-orchestrator').classList.add('hidden');
+      }
+      renderTracksDashboard();
+    }
+
+    function createTrackStripNode(track) {
+      const isActive = (activeQueue[activeQueuePointer] && activeQueue[activeQueuePointer].id === track.id);
+      const strip = document.createElement('div');
+      strip.className = `track-strip ${isActive ? 'active-strip' : ''}`;
+      strip.id = `strip-target-${track.id}`;
+
+      const thumbnailSrc = `https://img.youtube.com/vi/${track.id}/hqdefault.jpg`;
+
+      strip.innerHTML = `
+        <div class="track-main" onclick="bootstrapSelectedTrack('${track.id}')">
+          <div class="track-banner">
+            <img src="${thumbnailSrc}" alt="Cover Thumbnail">
+          </div>
+          <div class="track-details">
+            <div class="track-title">${track.title}</div>
+            <div class="track-status">${isActive ? 'Now Playing' : 'Not Playing'}</div>
+          </div>
+          <div class="track-actions" onclick="event.stopPropagation();">
+            <button class="strip-control-btn" onclick="openPlaylistInterfacingPipeline('${track.id}')" title="Manage Playlists" style="color: var(--accent-color); margin-right: 2px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+            </button>
+            <button class="strip-control-btn" onclick="toggleFavoriteAction('${track.id}')" title="Favorite">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="${track.favorite ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" style="${track.favorite ? 'color:#ef4444;' : ''}"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+            </button>
+            <button class="strip-control-btn" onclick="executeExternalDownloadConverter('${track.id}')" title="Download">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            </button>
+            <button class="strip-control-btn" onclick="triggerTrackDeletionPipeline('${track.id}')" title="Delete Track">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+            </button>
+          </div>
+        </div>
+        ${isActive ? `
+        <div class="track-progress-container" onclick="event.stopPropagation();">
+          <div class="track-progress-bar" onclick="seekTrackFromStrip(event)">
+            <div class="track-progress-fill" id="strip-fill-node"></div>
+          </div>
+          <span class="track-duration" id="strip-duration-node">0:00</span>
+        </div>
+        ` : ''}
+      `;
+      return strip;
+    }
+
+    function bootstrapSelectedTrack(trackId) {
+      if (currentTabIndex === 'favorites') {
+        activeQueue = [...trackLibrary].filter(t => t.favorite);
+      } else if (currentTabIndex.startsWith('playlist-')) {
+        const pId = currentTabIndex.replace('playlist-', '');
+        const targetP = playlistLibrary.find(p => p.id === pId);
+        activeQueue = targetP ? trackLibrary.filter(t => targetP.tracks.includes(t.id)) : [...trackLibrary];
+      } else {
+        activeQueue = [...trackLibrary];
+      }
+      
+      activeQueuePointer = activeQueue.findIndex(t => t.id === trackId);
+      executeAudioStreamPipeline(activeQueue[activeQueuePointer]);
+    }
+
+    function executeAudioStreamPipeline(track) {
+      if(!track) return;
+      clearInterval(timelineUpdateInterval);
+
+      document.getElementById('dock-title-text').innerText = track.title;
+      document.getElementById('dock-wave').classList.add('playing');
+      document.getElementById('dock-btn-play').innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>`;
+
+      bootstrapYoutubeIframePlayer(track.id);
+      renderTracksDashboard();
+    }
+
+    function bootstrapYoutubeIframePlayer(videoId) {
+      if(!ytApiReady) { triggerSystemToast("Awaiting Streaming Core..."); return; }
+      if(ytPlayer) {
+        ytPlayer.loadVideoById(videoId);
+      } else {
+        ytPlayer = new YT.Player('iframe-target', {
+          height: '100%',
+          width: '100%',
+          videoId: videoId,
+          playerVars: { 'autoplay': 1, 'controls': 0, 'disablekb': 1, 'fs': 0, 'modestbranding': 1, 'rel':0 },
+          events: {
+            'onReady': (e) => e.target.playVideo(),
+            'onStateChange': handleYoutubeStateTransitions
+          }
+        });
+      }
+      initTrackTimelineTicker();
+    }
+
+    function handleYoutubeStateTransitions(event) {
+      if(event.data === YT.PlayerState.PLAYING) {
+        const realTitle = ytPlayer.getVideoData().title;
+        if(realTitle && activeQueue[activeQueuePointer].title.includes("Fetching")) {
+          activeQueue[activeQueuePointer].title = realTitle;
+          const libMatch = trackLibrary.find(t => t.id === activeQueue[activeQueuePointer].id);
+          if(libMatch) {
+            libMatch.title = realTitle;
+            localStorage.setItem('sonata_library', JSON.stringify(trackLibrary));
+            syncToCloud(() => window.SonataCloud.updateTrackTitle(libMatch.id, realTitle));
+          }
+          document.getElementById('dock-title-text').innerText = realTitle;
+          renderTracksDashboard();
+        }
+      }
+      if(event.data === YT.PlayerState.ENDED) executeNextTrackTrackWrap();
+    }
+
+    function initTrackTimelineTicker() {
+      const fillDock = document.getElementById('dock-progress-fill');
+      const textDock = document.getElementById('dock-duration-display');
+
+      timelineUpdateInterval = setInterval(() => {
+        let currentTime = 0;
+        let duration = 0;
+
+        if(ytPlayer && ytPlayer.getCurrentTime) {
+          currentTime = ytPlayer.getCurrentTime();
+          duration = ytPlayer.getDuration() || 1;
+        }
+
+        const percentage = (currentTime / duration) * 100;
+        if(fillDock) fillDock.style.width = `${percentage}%`;
+        
+        const fillStrip = document.getElementById('strip-fill-node');
+        if(fillStrip) fillStrip.style.width = `${percentage}%`;
+
+        if(textDock) textDock.innerText = formatTimeStrings(currentTime) + " / " + formatTimeStrings(duration);
+      }, 350);
+    }
+
+    function seekToAudioRatioPosition(ratio) {
+      if(ytPlayer && ytPlayer.getDuration) {
+        ytPlayer.seekTo(ytPlayer.getDuration() * ratio, true);
+      }
+    }
+
+    function seekTrackFromStrip(event) {
+      const rect = event.currentTarget.getBoundingClientRect();
+      const ratio = (event.clientX - rect.left) / rect.width;
+      seekToAudioRatioPosition(ratio);
+    }
+
+    function togglePlaybackState() {
+      const wave = document.getElementById('dock-wave');
+      const playBtn = document.getElementById('dock-btn-play');
+
+      if (ytPlayer) {
+        if(ytPlayer.getPlayerState() === YT.PlayerState.PLAYING) {
+          ytPlayer.pauseVideo();
+          wave.classList.remove('playing');
+          playBtn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>`;
+        } else {
+          ytPlayer.playVideo();
+          wave.classList.add('playing');
+          playBtn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>`;
+        }
+      }
+    }
+
+    function executeNextTrackTrackWrap() {
+      if(activeQueue.length <= 1) return;
+      activeQueuePointer = (activeQueuePointer + 1) % activeQueue.length;
+      executeAudioStreamPipeline(activeQueue[activeQueuePointer]);
+    }
+
+    function executePrevTrackTrackWrap() {
+      if(activeQueue.length <= 1) return;
+      activeQueuePointer = (activeQueuePointer - 1 + activeQueue.length) % activeQueue.length;
+      executeAudioStreamPipeline(activeQueue[activeQueuePointer]);
+    }
+
+    function toggleFavoriteAction(trackId) {
+      const target = trackLibrary.find(t => t.id === trackId);
+      if(target) {
+        target.favorite = !target.favorite;
+        localStorage.setItem('sonata_library', JSON.stringify(trackLibrary));
+        syncToCloud(() => window.SonataCloud.setTrackFavorite(trackId, target.favorite));
+        triggerSystemToast(target.favorite ? "Added to luxury vault" : "Removed from vault");
+        renderTracksDashboard();
+      }
+    }
+
+    function executeExternalDownloadConverter(trackId) {
+      navigator.clipboard.writeText(`https://www.youtube.com/watch?v=${trackId}`);
+      triggerSystemToast("URL copied. Opening converter...");
+      setTimeout(() => { window.open(`https://convertytmp3.org/`, '_blank'); }, 1500);
+    }
+
+    // 10X: replaces window.confirm() with the unified glassmorphism delete modal
+    function triggerTrackDeletionPipeline(trackId) {
+      const targetedTrack = trackLibrary.find(t => t.id === trackId);
+      if (!targetedTrack) return;
+
+      deleteContext = { type: 'track', id: trackId };
+      presentDeleteConfirmationModal({
+        heading: 'Remove Track',
+        message: 'Are you sure you want to permanently detach this asset from your local streaming workspace?',
+        targetLabel: targetedTrack.title
+      });
+    }
+
+    function presentDeleteConfirmationModal({ heading, message, targetLabel }) {
+      document.getElementById('delete-modal-heading').innerText = heading;
+      document.getElementById('delete-modal-message').innerText = message;
+      document.getElementById('lbl-delete-target-title').innerText = targetLabel;
+      document.getElementById('modal-delete-confirm').classList.remove('hidden');
+    }
+
+    function closeDeleteConfirmationModal() {
+      deleteContext = null;
+      document.getElementById('modal-delete-confirm').classList.add('hidden');
+    }
+
+    // Single dispatcher driving the one confirm button — routes to the correct deletion routine
+    function executeDeletionConfirmed() {
+      if (!deleteContext) return;
+      const { type, id } = deleteContext;
+
+      if (type === 'track') {
+        executeTrackDeletion(id);
+      } else if (type === 'playlist') {
+        executePlaylistDeletion(id);
+      }
+
+      closeDeleteConfirmationModal();
+    }
+
+    function executeTrackDeletion(trackId) {
+      const currentlyPlayingTrack = activeQueue[activeQueuePointer];
+      const shiftingCurrentPlayContext = currentlyPlayingTrack && currentlyPlayingTrack.id === trackId;
+
+      trackLibrary = trackLibrary.filter(t => t.id !== trackId);
+      localStorage.setItem('sonata_library', JSON.stringify(trackLibrary));
+      syncToCloud(() => window.SonataCloud.deleteTrack(trackId));
+
+      // Cascade deletions safely through normalized playlists
+      const affectedPlaylists = playlistLibrary.filter(p => p.tracks.includes(trackId));
+      playlistLibrary.forEach(p => {
+        p.tracks = p.tracks.filter(id => id !== trackId);
+      });
+      localStorage.setItem('sonata_playlists', JSON.stringify(playlistLibrary));
+      affectedPlaylists.forEach(p => syncToCloud(() => window.SonataCloud.savePlaylist(p)));
+
+      triggerSystemToast("Track removed successfully");
+
+      if (shiftingCurrentPlayContext) {
+        if (ytPlayer && ytPlayer.stopVideo) {
+          ytPlayer.stopVideo();
+        }
+        clearInterval(timelineUpdateInterval);
+        
+        document.getElementById('dock-title-text').innerText = "Select a Track";
+        document.getElementById('dock-wave').classList.remove('playing');
+        document.getElementById('dock-btn-play').innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>`;
+        document.getElementById('dock-progress-fill').style.width = "0%";
+        document.getElementById('dock-duration-display').innerText = "0:00 / 0:00";
+        
+        activeQueue = [];
+        activeQueuePointer = -1;
+      } else if (currentlyPlayingTrack) {
+        if (currentTabIndex === 'favorites') {
+          activeQueue = trackLibrary.filter(t => t.favorite);
+        } else if (currentTabIndex.startsWith('playlist-')) {
+          const pId = currentTabIndex.replace('playlist-', '');
+          const targetP = playlistLibrary.find(p => p.id === pId);
+          activeQueue = targetP ? trackLibrary.filter(t => targetP.tracks.includes(t.id)) : [...trackLibrary];
+        } else {
+          activeQueue = [...trackLibrary];
+        }
+        activeQueuePointer = activeQueue.findIndex(t => t.id === currentlyPlayingTrack.id);
+      }
+
+      renderAppMetrics();
+      renderTracksDashboard();
+    }
+
+    function executePlaylistDeletion(playlistId) {
+      const wasViewingThisPlaylist = currentTabIndex === `playlist-${playlistId}`;
+
+      playlistLibrary = playlistLibrary.filter(p => p.id !== playlistId);
+      localStorage.setItem('sonata_playlists', JSON.stringify(playlistLibrary));
+      syncToCloud(() => window.SonataCloud.deletePlaylist(playlistId));
+
+      triggerSystemToast("Playlist permanently wiped");
+      renderAppMetrics();
+      renderPlaylistsDashboardModal();
+
+      if (wasViewingThisPlaylist) {
+        switchTab('all');
+      } else {
+        renderTracksDashboard();
+      }
+    }
+
+    // Standardized helpers
+    function formatTimeStrings(seconds) {
+      if (isNaN(seconds)) return "0:00";
+      const mins = Math.floor(seconds / 60);
+      const secs = Math.floor(seconds % 60);
+      return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+    }
+
+    function triggerSystemToast(msg) {
+      const oldToast = document.querySelector('.toast-container');
+      if(oldToast) oldToast.remove();
+
+      const host = document.createElement('div');
+      host.className = 'toast-container';
+      host.innerText = msg;
+      document.body.appendChild(host);
+      setTimeout(() => host.remove(), 2500);
+    }
+  </script>
+
+  <!--
+    CLOUD BACKEND (Firebase) — REQUIRED SETUP
+    ==========================================
+    1. Create (or reuse) a Firebase project at https://console.firebase.google.com
+    2. Add a Web app to it, then paste its config into firebaseConfig below.
+    3. In the Firebase console, enable these Authentication providers:
+       Anonymous, Email/Password, and (optionally) Google.
+    4. Create a Cloud Firestore database (production mode is fine).
+    5. Deploy the rules from firestore.rules (same folder as this file) —
+       without them, Firestore denies all access by default.
+    Everything below degrades gracefully if this isn't filled in yet: the
+    app keeps working with localStorage only, and the Account row in
+    Settings will just show "Guest, saved on this device only."
+  -->
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js';
+    import {
+      getAuth, onAuthStateChanged, signInAnonymously,
+      createUserWithEmailAndPassword, signInWithEmailAndPassword,
+      linkWithCredential, EmailAuthProvider,
+      GoogleAuthProvider, signInWithPopup, linkWithPopup,
+      signOut
+    } from 'https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js';
+    import {
+      getFirestore, doc, setDoc, deleteDoc, collection, getDocs,
+      onSnapshot, serverTimestamp, writeBatch, enableIndexedDbPersistence
+    } from 'https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js';
+
+    // TODO: replace with your real config from
+    // Firebase Console -> Project Settings -> General -> Your apps -> Web app
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    function dispatch(name, detail) {
+      document.dispatchEvent(new CustomEvent(name, { detail }));
+    }
+
+    let auth, db, currentUser = null;
+    let unsubTracks = null;
+    let unsubPlaylists = null;
+
+    try {
+      const app = initializeApp(firebaseConfig);
+      auth = getAuth(app);
+      db = getFirestore(app);
+
+      enableIndexedDbPersistence(db).catch((err) => {
+        // Expected (and harmless) if multiple tabs are open, or the browser
+        // doesn't support it — Firestore just falls back to memory cache.
+        console.warn('Firestore offline persistence unavailable:', err.code);
+      });
+    } catch (err) {
+      console.error('Firebase failed to initialize:', err);
+      dispatch('sonata-auth-error', { message: err.message });
+    }
+
+    function watchUserData(uid) {
+      if (unsubTracks) unsubTracks();
+      if (unsubPlaylists) unsubPlaylists();
+
+      unsubTracks = onSnapshot(
+        collection(db, 'users', uid, 'tracks'),
+        (snap) => dispatch('sonata-tracks-changed', { tracks: snap.docs.map(d => d.data()) }),
+        (err) => console.error('Tracks listener error:', err)
+      );
+
+      unsubPlaylists = onSnapshot(
+        collection(db, 'users', uid, 'playlists'),
+        (snap) => dispatch('sonata-playlists-changed', { playlists: snap.docs.map(d => d.data()) }),
+        (err) => console.error('Playlists listener error:', err)
+      );
+    }
+
+    // One-time: if this user has never synced before and the browser has
+    // local data (from the pre-cloud, localStorage-only era), push it up.
+    async function migrateLocalDataIfNeeded(uid) {
+      const flagKey = `sonata_migrated_${uid}`;
+      if (localStorage.getItem(flagKey)) return;
+
+      try {
+        const existing = await getDocs(collection(db, 'users', uid, 'tracks'));
+        if (existing.empty) {
+          const localTracks = JSON.parse(localStorage.getItem('sonata_library') || '[]');
+          const localPlaylists = JSON.parse(localStorage.getItem('sonata_playlists') || '[]');
+
+          if (localTracks.length || localPlaylists.length) {
+            const batch = writeBatch(db);
+            localTracks.forEach((t) => {
+              batch.set(doc(db, 'users', uid, 'tracks', t.id), { ...t, addedAt: serverTimestamp() });
+            });
+            localPlaylists.forEach((p) => {
+              batch.set(doc(db, 'users', uid, 'playlists', p.id), {
+                id: p.id,
+                name: p.name,
+                trackIds: p.tracks || [],
+                createdAt: serverTimestamp(),
+                updatedAt: serverTimestamp()
+              });
+            });
+            await batch.commit();
+          }
+        }
+        localStorage.setItem(flagKey, '1');
+      } catch (err) {
+        console.warn('Local-to-cloud migration skipped:', err.message);
+      }
+    }
+
+    if (auth) {
+      onAuthStateChanged(auth, async (user) => {
+        currentUser = user;
+        if (user) {
+          await migrateLocalDataIfNeeded(user.uid);
+          watchUserData(user.uid);
+        }
+        dispatch('sonata-auth-changed', {
+          uid: user ? user.uid : null,
+          email: user ? user.email : null,
+          isAnonymous: user ? user.isAnonymous : true
+        });
+      });
+
+      if (!auth.currentUser) {
+        signInAnonymously(auth).catch((err) => {
+          console.error('Anonymous sign-in failed (check your Firebase config):', err);
+          dispatch('sonata-auth-error', { message: err.message });
+        });
+      }
+    }
+
+    function requireUid() {
+      if (!currentUser) throw new Error('Cloud is still connecting — try again in a moment.');
+      return currentUser.uid;
+    }
+
+    window.SonataCloud = {
+      getUser: () => currentUser,
+
+      saveTrack(track) {
+        const uid = requireUid();
+        return setDoc(doc(db, 'users', uid, 'tracks', track.id), { ...track, addedAt: serverTimestamp() }, { merge: true });
+      },
+      deleteTrack(trackId) {
+        const uid = requireUid();
+        return deleteDoc(doc(db, 'users', uid, 'tracks', trackId));
+      },
+      setTrackFavorite(trackId, favorite) {
+        const uid = requireUid();
+        return setDoc(doc(db, 'users', uid, 'tracks', trackId), { favorite }, { merge: true });
+      },
+      updateTrackTitle(trackId, title) {
+        const uid = requireUid();
+        return setDoc(doc(db, 'users', uid, 'tracks', trackId), { title }, { merge: true });
+      },
+
+      savePlaylist(playlist) {
+        const uid = requireUid();
+        return setDoc(doc(db, 'users', uid, 'playlists', playlist.id), {
+          id: playlist.id,
+          name: playlist.name,
+          trackIds: playlist.tracks || [],
+          updatedAt: serverTimestamp()
+        }, { merge: true });
+      },
+      deletePlaylist(playlistId) {
+        const uid = requireUid();
+        return deleteDoc(doc(db, 'users', uid, 'playlists', playlistId));
+      },
+
+      async signUpWithEmail(email, password) {
+        if (currentUser && currentUser.isAnonymous) {
+          const cred = EmailAuthProvider.credential(email, password);
+          return (await linkWithCredential(currentUser, cred)).user;
+        }
+        return (await createUserWithEmailAndPassword(auth, email, password)).user;
+      },
+      async signInWithEmail(email, password) {
+        return (await signInWithEmailAndPassword(auth, email, password)).user;
+      },
+      async signInWithGoogle() {
+        const provider = new GoogleAuthProvider();
+        if (currentUser && currentUser.isAnonymous) {
+          return (await linkWithPopup(currentUser, provider)).user;
+        }
+        return (await signInWithPopup(auth, provider)).user;
+      },
+      async signOutUser() {
+        await signOut(auth);
+        await signInAnonymously(auth);
+      }
+    };
+  </script>
+</body>
+</html>
