@@ -137,51 +137,48 @@
       align-items: center;
       gap: 12px;
       flex-grow: 1;
+      justify-content: flex-end;
     }
 
-    .search-wrapper {
-      position: relative;
+    /* --- SEARCH EXPAND CARD: the search icon reveals this visible glass card --- */
+    .search-expand-card {
+      background: var(--modal-surface);
+      border: 1px solid var(--modal-border);
+      backdrop-filter: blur(30px) saturate(180%);
+      -webkit-backdrop-filter: blur(30px) saturate(180%);
+      border-radius: 24px;
+      padding: 12px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+      animation: scaleUpBox 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .search-expand-input-row {
       display: flex;
       align-items: center;
+      gap: 10px;
+    }
+
+    .search-expand-input-row input {
       flex-grow: 1;
-      max-width: 460px;
       background: var(--input-surface);
-    }
-
-    .search-wrapper:focus-within {
-      border-color: var(--accent-color);
-      box-shadow: 0 0 20px var(--border-glow);
-    }
-
-    .search-wrapper input {
-      width: 100%;
-      background: transparent;
-      border: none;
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      height: 46px;
+      padding: 0 16px;
       color: var(--text-main);
       font-size: 14px;
       outline: none;
     }
 
-    .search-btn {
-      position: absolute;
-      right: 4px;
-      background: transparent;
-      border: none;
-      cursor: pointer;
-      color: var(--text-muted);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      transition: all 0.3s;
+    .search-expand-input-row input:focus {
+      border-color: var(--accent-color);
+      box-shadow: 0 0 20px var(--border-glow);
     }
-    
-    .search-wrapper input:focus + .search-btn,
-    .search-btn:hover {
-      color: var(--text-main);
-      background: var(--glass-surface);
+
+    .search-expand-input-row .icon-btn {
+      background: var(--accent-gradient);
+      border: none;
+      color: #ffffff;
     }
 
     .icon-btn {
@@ -513,6 +510,7 @@
       align-items: center;
       gap: 14px;
       max-width: 60%;
+      cursor: pointer;
     }
 
     .dock-controls {
@@ -556,6 +554,147 @@
     @keyframes bounce {
       0% { height: 3px; }
       100% { height: 16px; }
+    }
+
+    /* --- NOW PLAYING: full liquid-glass player card, opens from tapping the dock --- */
+    .now-playing-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(3, 0, 20, 0.55);
+      backdrop-filter: blur(30px) saturate(180%);
+      -webkit-backdrop-filter: blur(30px) saturate(180%);
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      z-index: 1500;
+      animation: fadeInOverlay 0.3s ease forwards;
+    }
+
+    .now-playing-card {
+      width: 100%;
+      max-width: 480px;
+      background: linear-gradient(160deg, var(--modal-surface) 0%, var(--surface-color) 100%);
+      border: 1px solid var(--modal-border);
+      border-radius: 36px 36px 0 0;
+      padding: 16px 28px calc(36px + var(--safe-bottom));
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 22px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 -20px 60px rgba(0, 0, 0, 0.5);
+      animation: npSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    /* Reuses the app's signature liquid-glass sheen, just softened so it
+       doesn't fight with the album art sitting on top of it. */
+    .now-playing-card::before {
+      content: '';
+      position: absolute;
+      inset: -50% -20%;
+      background: linear-gradient(115deg,
+        transparent 38%,
+        rgba(255, 255, 255, 0.08) 47%,
+        rgba(255, 255, 255, 0.16) 50%,
+        rgba(255, 255, 255, 0.08) 53%,
+        transparent 62%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    [data-theme="light"] .now-playing-card::before {
+      background: linear-gradient(115deg,
+        transparent 38%,
+        rgba(255, 255, 255, 0.35) 47%,
+        rgba(255, 255, 255, 0.55) 50%,
+        rgba(255, 255, 255, 0.35) 53%,
+        transparent 62%);
+    }
+
+    .now-playing-handle {
+      width: 40px;
+      height: 5px;
+      border-radius: 3px;
+      background: var(--glass-border);
+      cursor: pointer;
+      position: relative;
+      z-index: 2;
+    }
+
+    .now-playing-art-wrap {
+      width: 100%;
+      max-width: 280px;
+      aspect-ratio: 1 / 1;
+      border-radius: 28px;
+      overflow: hidden;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.45);
+      position: relative;
+      z-index: 1;
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .now-playing-art {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .now-playing-meta {
+      text-align: center;
+      width: 100%;
+      position: relative;
+      z-index: 1;
+    }
+
+    .now-playing-title {
+      font-size: 19px;
+      font-weight: 800;
+      letter-spacing: -0.4px;
+      background: var(--heading-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .now-playing-progress-row {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .now-playing-time-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .now-playing-controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 36px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .now-playing-play-ring {
+      padding: 20px;
+    }
+
+    @keyframes npSlideUp {
+      from { transform: translateY(40px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
     }
 
     /* --- SYSTEM NOTIFICATIONS & CONFIG OVERLAYS --- */
@@ -1062,152 +1201,6 @@
       box-shadow: 0 4px 15px rgba(var(--accent-rgb), 0.3);
     }
 
-    /* --- CLOUD ACCOUNT (Firebase Auth) --- */
-    .account-row {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      background: var(--glass-surface);
-      border: 1px solid var(--glass-border);
-      border-radius: 16px;
-      padding: 12px 14px;
-    }
-
-    .account-avatar {
-      width: 38px;
-      height: 38px;
-      border-radius: 50%;
-      background: var(--accent-gradient);
-      color: #ffffff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      font-size: 15px;
-      flex-shrink: 0;
-      text-transform: uppercase;
-    }
-
-    .account-info {
-      flex-grow: 1;
-      overflow: hidden;
-    }
-
-    .account-name {
-      font-size: 14px;
-      font-weight: 700;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .account-sub {
-      font-size: 11px;
-      color: var(--text-muted);
-      margin-top: 1px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .account-action-btn {
-      background: var(--accent-gradient);
-      color: #ffffff;
-      border: none;
-      font-size: 12px;
-      font-weight: 700;
-      padding: 9px 14px;
-      border-radius: 12px;
-      cursor: pointer;
-      flex-shrink: 0;
-      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    .account-action-btn:hover { transform: translateY(-1px); }
-
-    .account-action-btn.signed-in-state {
-      background: var(--glass-surface);
-      border: 1px solid var(--glass-border);
-      color: var(--text-main);
-      box-shadow: none;
-    }
-
-    .auth-error-banner {
-      background: rgba(255, 74, 74, 0.1);
-      border: 1px solid rgba(255, 74, 74, 0.3);
-      color: var(--danger-color);
-      font-size: 13px;
-      font-weight: 500;
-      padding: 10px 14px;
-      border-radius: 12px;
-      line-height: 1.4;
-    }
-
-    .auth-input-stack {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .auth-input {
-      width: 100%;
-      background: var(--input-surface);
-      border: 1px solid var(--border-color);
-      border-radius: 16px;
-      padding: 0 16px;
-      height: 48px;
-      color: var(--text-main);
-      font-size: 14px;
-      outline: none;
-    }
-    .auth-input:focus {
-      border-color: var(--accent-color);
-    }
-
-    .auth-divider {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      color: var(--text-muted);
-      font-size: 12px;
-      font-weight: 600;
-    }
-    .auth-divider::before,
-    .auth-divider::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: var(--glass-border);
-    }
-
-    .auth-google-btn {
-      width: 100%;
-      height: 48px;
-      background: var(--glass-surface);
-      border: 1px solid var(--glass-border);
-      border-radius: 16px;
-      color: var(--text-main);
-      font-size: 14px;
-      font-weight: 700;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    .auth-google-btn:hover {
-      background: var(--input-surface);
-      transform: translateY(-1px);
-    }
-
-    .google-g-badge {
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
-      background: conic-gradient(from 0deg, #4285F4 0deg 90deg, #34A853 90deg 180deg, #FBBC05 180deg 270deg, #EA4335 270deg 360deg);
-      flex-shrink: 0;
-    }
-
     /* --- RESPONSIVE: tablet / laptop / desktop ---
        Mobile (everything above) is untouched. Wider viewports get more
        breathing room and the track list grows from a single column into
@@ -1254,17 +1247,23 @@
         <h1>Sonata</h1>
       </div>
       <div class="input-toggle-container">
-        <div class="search-wrapper">
-          <input type="text" id="yt-url-input" placeholder="Paste YouTube link...">
-          <button class="search-btn" id="btn-trigger-search">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-          </button>
-        </div>
+        <button class="icon-btn" id="btn-toggle-search">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        </button>
         <button class="icon-btn" id="btn-toggle-settings">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
         </button>
       </div>
     </header>
+
+    <div class="search-expand-card hidden" id="search-expand-panel">
+      <div class="search-expand-input-row">
+        <input type="text" id="yt-url-input" placeholder="Paste YouTube link...">
+        <button class="icon-btn" id="btn-trigger-search" style="width:40px; height:40px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        </button>
+      </div>
+    </div>
 
     <div id="youtube-player-container" class="minimized">
       <div id="iframe-target"></div>
@@ -1301,7 +1300,7 @@
       <span class="track-duration" id="dock-duration-display">0:00 / 0:00</span>
     </div>
     <div class="dock-main">
-      <div class="dock-meta">
+      <div class="dock-meta" id="dock-meta-trigger">
         <div class="wave-container" id="dock-wave">
           <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
         </div>
@@ -1323,6 +1322,38 @@
     </div>
   </div>
 
+  <div class="now-playing-modal hidden" id="modal-now-playing">
+    <div class="now-playing-card">
+      <div class="now-playing-handle" id="np-handle"></div>
+      <div class="now-playing-art-wrap">
+        <img id="np-art" class="now-playing-art" src="" alt="Album Art" onerror="this.onerror=null; this.src=this.src.replace('maxresdefault','hqdefault');">
+      </div>
+      <div class="now-playing-meta">
+        <div class="now-playing-title" id="np-title">Select a Track</div>
+      </div>
+      <div class="now-playing-progress-row">
+        <div class="track-progress-bar" id="np-progress-wrapper">
+          <div class="track-progress-fill" id="np-progress-fill"></div>
+        </div>
+        <div class="now-playing-time-row">
+          <span id="np-time-current">0:00</span>
+          <span id="np-time-duration">0:00</span>
+        </div>
+      </div>
+      <div class="now-playing-controls">
+        <button class="strip-control-btn" id="np-btn-prev">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><polygon points="19 20 9 12 19 4 19 20"></polygon><line x1="5" y1="4" x2="5" y2="20" stroke="currentColor" stroke-width="2"></line></svg>
+        </button>
+        <button class="strip-control-btn dock-play-ring now-playing-play-ring" id="np-btn-play">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" id="np-play-svg"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+        </button>
+        <button class="strip-control-btn" id="np-btn-next">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 4 15 12 5 20 5 4"></polygon><line x1="19" y1="4" x2="19" y2="20" stroke="currentColor" stroke-width="2"></line></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <div class="settings-modal hidden" id="modal-settings">
     <div class="settings-content">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
@@ -1332,18 +1363,6 @@
         </button>
       </div>
       
-      <div class="setting-row-vertical">
-        <span class="setting-label">Cloud Account</span>
-        <div class="account-row" id="account-status-row">
-          <div class="account-avatar" id="account-avatar">G</div>
-          <div class="account-info">
-            <div class="account-name" id="account-name">Guest</div>
-            <div class="account-sub" id="account-sub">Saved on this device only</div>
-          </div>
-          <button class="account-action-btn" id="btn-open-auth">Sign In</button>
-        </div>
-      </div>
-
       <div class="setting-row">
         <span class="setting-label">Network Status</span>
         <strong id="status-network-indicator" style="color: #10b981; font-size: 14px;">Online</strong>
@@ -1365,45 +1384,6 @@
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="eye-icon-svg"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
         </button>
       </div>
-    </div>
-  </div>
-
-  <div class="settings-modal hidden" id="modal-auth">
-    <div class="playlist-modal-content">
-      <div style="display: flex; justify-content: space-between; align-items: center;">
-        <div>
-          <h3 style="font-weight: 800; font-size: 20px; letter-spacing: -0.5px;">Your Account</h3>
-          <p style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Sync your library across every device</p>
-        </div>
-        <button class="icon-btn" id="btn-close-auth" style="width:36px; height:36px;">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-        </button>
-      </div>
-
-      <div class="luxury-theme-track" id="auth-tab-switcher">
-        <div class="luxury-theme-pill active-pill" data-auth-tab="signin">Sign In</div>
-        <div class="luxury-theme-pill" data-auth-tab="signup">Create Account</div>
-      </div>
-
-      <div class="auth-error-banner hidden" id="auth-error-banner"></div>
-
-      <div class="auth-input-stack">
-        <input type="email" class="auth-input" id="input-auth-email" placeholder="Email address" autocomplete="email">
-        <input type="password" class="auth-input" id="input-auth-password" placeholder="Password (min 6 characters)" autocomplete="current-password">
-      </div>
-
-      <button class="playlist-create-btn" id="btn-auth-submit" style="width: 100%; height: 48px; font-size: 15px;">Sign In</button>
-
-      <div class="auth-divider"><span>or</span></div>
-
-      <button class="auth-google-btn" id="btn-auth-google">
-        <span class="google-g-badge"></span>
-        Continue with Google
-      </button>
-
-      <p style="font-size: 11px; color: var(--text-muted); text-align: center; margin-top: 4px;" id="auth-guest-note">
-        Using Sonata as a guest — your library is private to this device until you sign in.
-      </p>
     </div>
   </div>
 
@@ -1539,6 +1519,7 @@
     document.addEventListener("DOMContentLoaded", () => {
       setupDomListeners();
       setupCloudEventBridge();
+      setupMediaSessionHandlers();
       applyTheme(localStorage.getItem('sonata_theme') || 'deep');
       renderAppMetrics();
       reconstructTabEngineBars();
@@ -1582,6 +1563,98 @@
       });
     }
 
+    // --- SEARCH EXPAND PANEL: a single icon that reveals a visible glass card ---
+    function toggleSearchPanel() {
+      const panel = document.getElementById('search-expand-panel');
+      if (panel.classList.contains('hidden')) {
+        panel.classList.remove('hidden');
+        requestAnimationFrame(() => document.getElementById('yt-url-input').focus());
+      } else {
+        panel.classList.add('hidden');
+      }
+    }
+
+    // --- NOW PLAYING: full liquid-glass player card, opened from the dock ---
+    function openNowPlayingCard() {
+      if (activeQueuePointer === -1 || !activeQueue[activeQueuePointer]) {
+        triggerSystemToast("Nothing is playing yet");
+        return;
+      }
+      refreshNowPlayingCard();
+      document.getElementById('modal-now-playing').classList.remove('hidden');
+    }
+
+    function closeNowPlayingCard() {
+      document.getElementById('modal-now-playing').classList.add('hidden');
+    }
+
+    function refreshNowPlayingCard() {
+      const track = activeQueue[activeQueuePointer];
+      if (!track) return;
+      document.getElementById('np-title').innerText = track.title;
+      document.getElementById('np-art').src = `https://img.youtube.com/vi/${track.id}/maxresdefault.jpg`;
+      syncNowPlayingPlayButton();
+    }
+
+    function syncNowPlayingPlayButton() {
+      const npPlaySvg = document.getElementById('np-play-svg');
+      if (!npPlaySvg) return;
+      const isPlaying = ytPlayer && ytPlayer.getPlayerState && ytPlayer.getPlayerState() === YT.PlayerState.PLAYING;
+      npPlaySvg.innerHTML = isPlaying
+        ? `<rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect>`
+        : `<polygon points="5 3 19 12 5 21 5 3"></polygon>`;
+    }
+
+    // --- MEDIA SESSION: powers Sonata's player in the OS notification / lock screen ---
+    // Best supported on Android Chrome; iOS Safari support for these APIs is
+    // more limited, so behavior there can vary by OS version.
+    function setupMediaSessionHandlers() {
+      if (!('mediaSession' in navigator)) return;
+
+      navigator.mediaSession.setActionHandler('play', () => { if (ytPlayer) ytPlayer.playVideo(); });
+      navigator.mediaSession.setActionHandler('pause', () => { if (ytPlayer) ytPlayer.pauseVideo(); });
+      navigator.mediaSession.setActionHandler('previoustrack', executePrevTrackTrackWrap);
+      navigator.mediaSession.setActionHandler('nexttrack', executeNextTrackTrackWrap);
+
+      try {
+        navigator.mediaSession.setActionHandler('seekto', (details) => {
+          if (ytPlayer && ytPlayer.seekTo && typeof details.seekTime === 'number') {
+            ytPlayer.seekTo(details.seekTime, true);
+          }
+        });
+        navigator.mediaSession.setActionHandler('seekbackward', (details) => {
+          if (ytPlayer && ytPlayer.getCurrentTime) {
+            ytPlayer.seekTo(Math.max(ytPlayer.getCurrentTime() - (details.seekOffset || 10), 0), true);
+          }
+        });
+        navigator.mediaSession.setActionHandler('seekforward', (details) => {
+          if (ytPlayer && ytPlayer.getCurrentTime && ytPlayer.getDuration) {
+            ytPlayer.seekTo(Math.min(ytPlayer.getCurrentTime() + (details.seekOffset || 10), ytPlayer.getDuration()), true);
+          }
+        });
+      } catch (err) {
+        console.warn('Some Media Session seek actions are unsupported on this browser:', err);
+      }
+    }
+
+    function updateMediaSessionMetadata(track) {
+      if (!('mediaSession' in navigator) || !track) return;
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: track.title,
+        artist: 'Sonata',
+        album: 'YouTube Stream',
+        artwork: [
+          { src: `https://img.youtube.com/vi/${track.id}/mqdefault.jpg`, sizes: '320x180', type: 'image/jpeg' },
+          { src: `https://img.youtube.com/vi/${track.id}/hqdefault.jpg`, sizes: '480x360', type: 'image/jpeg' }
+        ]
+      });
+    }
+
+    function updateMediaSessionPlaybackState(state) {
+      if (!('mediaSession' in navigator)) return;
+      navigator.mediaSession.playbackState = state;
+    }
+
     // --- CLOUD SYNC BRIDGE ---
     // window.SonataCloud is defined by the Firebase module script at the
     // bottom of the page. Everything here is written defensively: if Firebase
@@ -1589,7 +1662,7 @@
     // the app keeps working exactly as it did with localStorage alone —
     // cloud sync is an enhancement, never a dependency.
 
-    let authModalMode = 'signin';
+    // (Account/login state removed — Sonata now syncs anonymously with no sign-in UI)
 
     function syncToCloud(fn) {
       if (!window.SonataCloud) return;
@@ -1604,7 +1677,6 @@
     }
 
     function setupCloudEventBridge() {
-      document.addEventListener('sonata-auth-changed', (e) => updateAccountUI(e.detail));
       document.addEventListener('sonata-auth-error', (e) => {
         console.warn('Cloud auth error:', e.detail && e.detail.message);
       });
@@ -1635,136 +1707,6 @@
       }
     }
 
-    function updateAccountUI(detail) {
-      const avatar = document.getElementById('account-avatar');
-      const name = document.getElementById('account-name');
-      const sub = document.getElementById('account-sub');
-      const btn = document.getElementById('btn-open-auth');
-      if (!avatar || !name || !sub || !btn) return;
-
-      if (!detail || !detail.uid || detail.isAnonymous) {
-        avatar.textContent = 'G';
-        name.textContent = 'Guest';
-        sub.textContent = 'Saved on this device only';
-        btn.textContent = 'Sign In';
-        btn.classList.remove('signed-in-state');
-      } else {
-        const label = detail.email || 'Signed in';
-        avatar.textContent = label.charAt(0);
-        name.textContent = label;
-        sub.textContent = 'Synced to the cloud';
-        btn.textContent = 'Sign Out';
-        btn.classList.add('signed-in-state');
-      }
-    }
-
-    function showAuthError(message) {
-      const banner = document.getElementById('auth-error-banner');
-      banner.textContent = message;
-      banner.classList.remove('hidden');
-    }
-
-    function clearAuthError() {
-      document.getElementById('auth-error-banner').classList.add('hidden');
-    }
-
-    function openAuthModal() {
-      clearAuthError();
-      document.getElementById('input-auth-password').value = '';
-      document.getElementById('modal-auth').classList.remove('hidden');
-    }
-
-    function closeAuthModal() {
-      document.getElementById('modal-auth').classList.add('hidden');
-    }
-
-    function setAuthModalMode(mode) {
-      authModalMode = mode;
-      document.querySelectorAll('#auth-tab-switcher .luxury-theme-pill').forEach(pill => {
-        pill.classList.toggle('active-pill', pill.getAttribute('data-auth-tab') === mode);
-      });
-      const submitBtn = document.getElementById('btn-auth-submit');
-      submitBtn.textContent = mode === 'signup' ? 'Create Account' : 'Sign In';
-      clearAuthError();
-    }
-
-    function setupAccountAndAuthListeners() {
-      document.getElementById('btn-open-auth').addEventListener('click', () => {
-        const user = window.SonataCloud && window.SonataCloud.getUser();
-        if (user && !user.isAnonymous) {
-          window.SonataCloud.signOutUser()
-            .then(() => triggerSystemToast('Signed out — back to guest mode'))
-            .catch(() => triggerSystemToast('Sign out failed'));
-        } else {
-          setAuthModalMode('signin');
-          openAuthModal();
-        }
-      });
-
-      document.getElementById('btn-close-auth').addEventListener('click', closeAuthModal);
-
-      document.querySelectorAll('#auth-tab-switcher .luxury-theme-pill').forEach(pill => {
-        pill.addEventListener('click', (e) => {
-          setAuthModalMode(e.currentTarget.getAttribute('data-auth-tab'));
-        });
-      });
-
-      document.getElementById('btn-auth-submit').addEventListener('click', handleAuthSubmit);
-      document.getElementById('input-auth-password').addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') handleAuthSubmit();
-      });
-
-      document.getElementById('btn-auth-google').addEventListener('click', () => {
-        if (!window.SonataCloud) return;
-        clearAuthError();
-        window.SonataCloud.signInWithGoogle()
-          .then(() => {
-            closeAuthModal();
-            triggerSystemToast('Signed in with Google');
-          })
-          .catch((err) => showAuthError(humanizeAuthError(err)));
-      });
-    }
-
-    function handleAuthSubmit() {
-      if (!window.SonataCloud) {
-        showAuthError("Cloud isn't configured yet — ask your developer to add the Firebase config.");
-        return;
-      }
-
-      const email = document.getElementById('input-auth-email').value.trim();
-      const password = document.getElementById('input-auth-password').value;
-      clearAuthError();
-
-      if (!email || !password) {
-        showAuthError('Enter both an email and a password.');
-        return;
-      }
-
-      const action = authModalMode === 'signup'
-        ? window.SonataCloud.signUpWithEmail(email, password)
-        : window.SonataCloud.signInWithEmail(email, password);
-
-      action
-        .then(() => {
-          closeAuthModal();
-          triggerSystemToast(authModalMode === 'signup' ? 'Account created' : 'Signed in');
-        })
-        .catch((err) => showAuthError(humanizeAuthError(err)));
-    }
-
-    function humanizeAuthError(err) {
-      const code = err && err.code ? err.code : '';
-      if (code.includes('email-already-in-use')) return 'That email already has an account — try signing in instead.';
-      if (code.includes('invalid-email')) return 'That email address looks invalid.';
-      if (code.includes('weak-password')) return 'Password should be at least 6 characters.';
-      if (code.includes('wrong-password') || code.includes('invalid-credential')) return 'Incorrect email or password.';
-      if (code.includes('user-not-found')) return "No account found with that email — try Create Account.";
-      if (code.includes('popup-closed-by-user')) return 'Google sign-in was closed before finishing.';
-      if (code.includes('network-request-failed')) return "Couldn't reach the cloud — check your connection.";
-      return (err && err.message) || 'Something went wrong. Please try again.';
-    }
-
     const tag = document.createElement('script');
     tag.src = "https://www.youtube.com/iframe_api";
     document.getElementsByTagName('script')[0].parentNode.insertBefore(tag, document.getElementsByTagName('script')[0]);
@@ -1789,6 +1731,8 @@
           urlInput.value = "";
         }
       });
+
+      document.getElementById('btn-toggle-search').addEventListener('click', toggleSearchPanel);
 
       document.getElementById('btn-toggle-settings').addEventListener('click', () => {
         document.getElementById('modal-settings').classList.remove('hidden');
@@ -1844,6 +1788,12 @@
         if(!document.getElementById('modal-delete-confirm').classList.contains('hidden')) {
           closeDeleteConfirmationModal();
         }
+        if(!document.getElementById('modal-now-playing').classList.contains('hidden')) {
+          closeNowPlayingCard();
+        }
+        if(!document.getElementById('search-expand-panel').classList.contains('hidden')) {
+          document.getElementById('search-expand-panel').classList.add('hidden');
+        }
       });
 
       document.querySelectorAll('#theme-pill-track .luxury-theme-pill').forEach(pill => {
@@ -1852,8 +1802,6 @@
           applyTheme(selectedTheme);
         });
       });
-
-      setupAccountAndAuthListeners();
 
       document.getElementById('btn-toggle-video').addEventListener('click', () => {
         isVideoVisible = !isVideoVisible;
@@ -1873,6 +1821,21 @@
       document.getElementById('dock-btn-prev').addEventListener('click', executePrevTrackTrackWrap);
 
       document.getElementById('dock-progress-wrapper').addEventListener('click', (e) => {
+        const rect = e.currentTarget.getBoundingClientRect();
+        const ratio = (e.clientX - rect.left) / rect.width;
+        seekToAudioRatioPosition(ratio);
+      });
+
+      // Now Playing liquid-glass card — opens by tapping the dock's title/wave area
+      document.getElementById('dock-meta-trigger').addEventListener('click', openNowPlayingCard);
+      document.getElementById('np-handle').addEventListener('click', closeNowPlayingCard);
+      document.getElementById('modal-now-playing').addEventListener('click', (e) => {
+        if (e.target.id === 'modal-now-playing') closeNowPlayingCard();
+      });
+      document.getElementById('np-btn-play').addEventListener('click', togglePlaybackState);
+      document.getElementById('np-btn-next').addEventListener('click', executeNextTrackTrackWrap);
+      document.getElementById('np-btn-prev').addEventListener('click', executePrevTrackTrackWrap);
+      document.getElementById('np-progress-wrapper').addEventListener('click', (e) => {
         const rect = e.currentTarget.getBoundingClientRect();
         const ratio = (e.clientX - rect.left) / rect.width;
         seekToAudioRatioPosition(ratio);
@@ -2340,6 +2303,12 @@
       document.getElementById('dock-wave').classList.add('playing');
       document.getElementById('dock-btn-play').innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>`;
 
+      if (!document.getElementById('modal-now-playing').classList.contains('hidden')) {
+        refreshNowPlayingCard();
+      }
+      updateMediaSessionMetadata(track);
+      updateMediaSessionPlaybackState('playing');
+
       bootstrapYoutubeIframePlayer(track.id);
       renderTracksDashboard();
     }
@@ -2375,9 +2344,26 @@
             syncToCloud(() => window.SonataCloud.updateTrackTitle(libMatch.id, realTitle));
           }
           document.getElementById('dock-title-text').innerText = realTitle;
+          updateMediaSessionMetadata(activeQueue[activeQueuePointer]);
+          if (!document.getElementById('modal-now-playing').classList.contains('hidden')) {
+            refreshNowPlayingCard();
+          }
           renderTracksDashboard();
         }
       }
+
+      if(event.data === YT.PlayerState.PLAYING || event.data === YT.PlayerState.PAUSED) {
+        const wave = document.getElementById('dock-wave');
+        const playBtn = document.getElementById('dock-btn-play');
+        const isPlaying = event.data === YT.PlayerState.PLAYING;
+        wave.classList.toggle('playing', isPlaying);
+        playBtn.innerHTML = isPlaying
+          ? `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>`
+          : `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>`;
+        syncNowPlayingPlayButton();
+        updateMediaSessionPlaybackState(isPlaying ? 'playing' : 'paused');
+      }
+
       if(event.data === YT.PlayerState.ENDED) executeNextTrackTrackWrap();
     }
 
@@ -2401,6 +2387,26 @@
         if(fillStrip) fillStrip.style.width = `${percentage}%`;
 
         if(textDock) textDock.innerText = formatTimeStrings(currentTime) + " / " + formatTimeStrings(duration);
+
+        const fillNowPlaying = document.getElementById('np-progress-fill');
+        if(fillNowPlaying) fillNowPlaying.style.width = `${percentage}%`;
+
+        const npCurrent = document.getElementById('np-time-current');
+        const npDuration = document.getElementById('np-time-duration');
+        if(npCurrent) npCurrent.innerText = formatTimeStrings(currentTime);
+        if(npDuration) npDuration.innerText = formatTimeStrings(duration);
+
+        if ('mediaSession' in navigator && navigator.mediaSession.setPositionState && duration > 0) {
+          try {
+            navigator.mediaSession.setPositionState({
+              duration: duration,
+              playbackRate: 1,
+              position: Math.min(currentTime, duration)
+            });
+          } catch (err) {
+            // Some browsers briefly throw if values are out of range mid-seek — safe to ignore.
+          }
+        }
       }, 350);
     }
 
@@ -2425,11 +2431,14 @@
           ytPlayer.pauseVideo();
           wave.classList.remove('playing');
           playBtn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>`;
+          updateMediaSessionPlaybackState('paused');
         } else {
           ytPlayer.playVideo();
           wave.classList.add('playing');
           playBtn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>`;
+          updateMediaSessionPlaybackState('playing');
         }
+        syncNowPlayingPlayButton();
       }
     }
 
@@ -2530,7 +2539,12 @@
         document.getElementById('dock-btn-play').innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>`;
         document.getElementById('dock-progress-fill').style.width = "0%";
         document.getElementById('dock-duration-display').innerText = "0:00 / 0:00";
-        
+
+        if (!document.getElementById('modal-now-playing').classList.contains('hidden')) {
+          closeNowPlayingCard();
+        }
+        updateMediaSessionPlaybackState('none');
+
         activeQueue = [];
         activeQueuePointer = -1;
       } else if (currentlyPlayingTrack) {
@@ -2605,11 +2619,7 @@
   <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js';
     import {
-      getAuth, onAuthStateChanged, signInAnonymously,
-      createUserWithEmailAndPassword, signInWithEmailAndPassword,
-      linkWithCredential, EmailAuthProvider,
-      GoogleAuthProvider, signInWithPopup, linkWithPopup,
-      signOut
+      getAuth, onAuthStateChanged, signInAnonymously
     } from 'https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js';
     import {
       getFirestore, doc, setDoc, deleteDoc, collection, getDocs,
@@ -2761,28 +2771,6 @@
       deletePlaylist(playlistId) {
         const uid = requireUid();
         return deleteDoc(doc(db, 'users', uid, 'playlists', playlistId));
-      },
-
-      async signUpWithEmail(email, password) {
-        if (currentUser && currentUser.isAnonymous) {
-          const cred = EmailAuthProvider.credential(email, password);
-          return (await linkWithCredential(currentUser, cred)).user;
-        }
-        return (await createUserWithEmailAndPassword(auth, email, password)).user;
-      },
-      async signInWithEmail(email, password) {
-        return (await signInWithEmailAndPassword(auth, email, password)).user;
-      },
-      async signInWithGoogle() {
-        const provider = new GoogleAuthProvider();
-        if (currentUser && currentUser.isAnonymous) {
-          return (await linkWithPopup(currentUser, provider)).user;
-        }
-        return (await signInWithPopup(auth, provider)).user;
-      },
-      async signOutUser() {
-        await signOut(auth);
-        await signInAnonymously(auth);
       }
     };
   </script>
