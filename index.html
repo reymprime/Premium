@@ -92,6 +92,39 @@
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
       user-select: none;
       -webkit-font-smoothing: antialiased;
+      /* Kills the default gray/blue rectangular tap-flash that Android/iOS
+         WebViews stamp on top of anything clickable — this rectangle was
+         showing up over rounded pills, cards and icon buttons the instant
+         they were tapped, which is what was making selection look "boxed"
+         and cheap despite the rounded, gradient styling underneath. */
+      -webkit-tap-highlight-color: transparent;
+      -webkit-touch-callout: none;
+      outline: none;
+    }
+
+    button, .icon-btn, .strip-control-btn, .tab-item, .nav-card,
+    .track-strip, .dock-play-ring, .delete-confirm-btn, .delete-cancel-lnk,
+    .playlist-create-btn, .luxury-theme-pill, .album-item-row, .playlist-selector-item {
+      -webkit-tap-highlight-color: transparent;
+      outline: none;
+    }
+    button:focus, .icon-btn:focus, .strip-control-btn:focus, .tab-item:focus {
+      outline: none;
+    }
+
+    /* Native browser button chrome (default border/background/inset shadow)
+       was the real culprit behind the square artifact around the circular
+       play buttons — buttons keep their platform "appearance" unless it's
+       explicitly reset, so the round CSS box-shadow was rendering on top of
+       a square native control instead of replacing it. */
+    button {
+      -webkit-appearance: none;
+      appearance: none;
+      border: none;
+      background: none;
+      font: inherit;
+      color: inherit;
+      touch-action: manipulation;
     }
 
     body {
@@ -102,6 +135,27 @@
       justify-content: center;
       padding-bottom: calc(120px + var(--safe-bottom));
       overflow-x: hidden;
+      position: relative;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.035;
+      mix-blend-mode: overlay;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+
+    [data-theme="light"] body::before {
+      opacity: 0.02;
+    }
+
+    .app-container, .bottom-dock {
+      position: relative;
+      z-index: 1;
     }
 
     .app-container {
@@ -130,6 +184,17 @@
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       text-shadow: 0 4px 12px rgba(var(--accent-rgb), 0.15);
+      cursor: pointer;
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), filter 0.25s ease;
+    }
+
+    .logo-group h1:hover {
+      transform: translateY(-1px);
+      filter: drop-shadow(0 6px 14px rgba(var(--accent-rgb), 0.35));
+    }
+
+    .logo-group h1:active {
+      transform: translateY(0px) scale(0.97);
     }
 
     .input-toggle-container {
@@ -176,14 +241,18 @@
     }
 
     .search-expand-input-row .icon-btn {
-      background: var(--accent-gradient);
-      border: none;
-      color: #ffffff;
+      background: var(--accent-gradient) !important;
+      border: 1px solid rgba(255, 255, 255, 0.25) !important;
+      color: #ffffff !important;
+      box-shadow: 0 8px 20px rgba(var(--accent-rgb), 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+    }
+    .search-expand-input-row .icon-btn svg {
+      stroke: #ffffff !important;
     }
 
     .icon-btn {
-      background: var(--surface-glass);
-      border: 1px solid var(--border-color);
+      background: linear-gradient(155deg, rgba(255, 255, 255, 0.10) 0%, rgba(255, 255, 255, 0.02) 100%), var(--surface-glass);
+      border: 1px solid rgba(255, 255, 255, 0.12);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
       color: var(--text-main);
@@ -194,16 +263,28 @@
       width: 44px;
       height: 44px;
       border-radius: 50%;
-      transition: all 0.3s;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
       flex-shrink: 0;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.10), inset 0 -1px 2px rgba(0, 0, 0, 0.15);
     }
     .icon-btn:hover {
-      border-color: rgba(255, 255, 255, 0.2);
-      transform: translateY(-1px);
+      border-color: rgba(255, 255, 255, 0.24);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 22px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.16), inset 0 -1px 2px rgba(0, 0, 0, 0.15);
+    }
+    .icon-btn:active {
+      transform: translateY(0px) scale(0.95);
+    }
+
+    [data-theme="light"] .icon-btn {
+      background: linear-gradient(155deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 250, 255, 0.85) 100%);
+      border: 1px solid rgba(15, 23, 42, 0.14);
+      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.8);
     }
 
     [data-theme="light"] .icon-btn:hover {
-      border-color: rgba(15, 23, 42, 0.18);
+      border-color: rgba(var(--accent-rgb), 0.35);
+      box-shadow: 0 12px 26px rgba(15, 23, 42, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.9);
     }
 
     /* --- HERO LUXURY CARDS --- */
@@ -261,6 +342,11 @@
       box-shadow: 0 12px 30px rgba(0,0,0,0.4);
     }
 
+    .nav-card:active {
+      transform: translateY(-1px) scale(0.97);
+      transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
     [data-theme="light"] .nav-card:hover {
       border-color: rgba(15, 23, 42, 0.18);
     }
@@ -284,15 +370,25 @@
       padding: 4px 10px;
       border-radius: 20px;
       z-index: 2;
+      box-shadow: 0 4px 12px rgba(var(--accent-rgb), 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3);
     }
 
     /* --- PREMIUM HORIZONTAL TABS --- */
+    /* overflow-x:auto here forces the browser to also clip the Y axis
+       (per the CSS Overflow spec, 'visible' on one axis gets force-changed
+       to 'auto' when the other axis isn't visible) — the active tab's glow
+       shadow was getting hard-clipped by that instead of fading naturally,
+       since there was almost no padding for it to bleed into. Padding is
+       increased below to give it room, with a matching negative margin so
+       the extra padding doesn't push the track list down. */
     .tabs-scroll {
       display: flex;
       gap: 8px;
       overflow-x: auto;
       scrollbar-width: none;
-      padding: 2px;
+      -ms-overflow-style: none;
+      padding: 10px 2px 22px;
+      margin-bottom: -24px;
     }
     .tabs-scroll::-webkit-scrollbar { display: none; }
 
@@ -300,27 +396,90 @@
       padding: 10px 20px;
       background: transparent;
       border: 1px solid transparent;
-      border-radius: 24px;
+      border-radius: 999px;
       font-size: 14px;
       font-weight: 600;
       cursor: pointer;
       white-space: nowrap;
       color: var(--text-muted);
-      transition: all 0.3s;
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .tab-item:hover:not(.active) {
+      color: var(--text-main);
+      background: var(--glass-surface);
     }
 
     .tab-item.active {
       background: var(--accent-gradient);
       color: #ffffff;
-      box-shadow: 0 8px 20px rgba(var(--accent-rgb), 0.3);
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      box-shadow: 0 4px 14px rgba(var(--accent-rgb), 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .tab-item.active::before {
+      content: '';
+      position: absolute;
+      inset: -50% -20%;
+      background: linear-gradient(115deg,
+        transparent 40%,
+        rgba(255, 255, 255, 0.22) 48%,
+        rgba(255, 255, 255, 0.32) 50%,
+        rgba(255, 255, 255, 0.22) 52%,
+        transparent 60%);
+      pointer-events: none;
     }
 
     /* --- PREMIUM TRACK LIST ARCHITECTURE --- */
     .track-section-title {
       font-size: 18px;
       font-weight: 700;
-      margin-bottom: 16px;
       letter-spacing: -0.3px;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .section-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .play-all-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--accent-gradient);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      padding: 9px 16px 9px 12px;
+      border-radius: 999px;
+      font-size: 12.5px;
+      font-weight: 700;
+      letter-spacing: -0.1px;
+      cursor: pointer;
+      flex-shrink: 0;
+      box-shadow: 0 8px 18px rgba(var(--accent-rgb), 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .play-all-btn svg { flex-shrink: 0; }
+
+    .play-all-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 22px rgba(var(--accent-rgb), 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    }
+
+    .play-all-btn:active {
+      transform: translateY(0) scale(0.95);
     }
 
     .track-list {
@@ -332,26 +491,72 @@
     .track-strip {
       background: var(--surface-color);
       border: 1px solid var(--border-color);
-      backdrop-filter: blur(30px);
-      -webkit-backdrop-filter: blur(30px);
       border-radius: 24px;
-      padding: 14px;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
       position: relative;
-      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    .track-strip:hover {
-      background: var(--glass-surface);
-      border-color: var(--glass-border);
+      overflow: hidden;
+      transition: border-color 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .track-strip.active-strip {
       border-color: var(--accent-color);
-      background: rgba(var(--accent-rgb), 0.04);
       box-shadow: 0 10px 30px rgba(var(--accent-rgb), 0.08);
+    }
+
+    /* Colored action panels revealed underneath as the content is swiped */
+    .swipe-bg {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 112px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 12px;
+      letter-spacing: -0.1px;
+      z-index: 0;
+    }
+
+    .swipe-bg-favorite {
+      left: 0;
+      background: linear-gradient(135deg, #f43f5e 0%, #ec4899 100%);
+      justify-content: flex-start;
+      padding-left: 22px;
+    }
+
+    .swipe-bg-delete {
+      right: 0;
+      background: var(--danger-gradient);
+      justify-content: flex-end;
+      padding-right: 22px;
+    }
+
+    .swipe-content {
+      position: relative;
+      z-index: 1;
+      background: var(--modal-surface);
+      backdrop-filter: blur(30px);
+      -webkit-backdrop-filter: blur(30px);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      padding: 14px;
+      touch-action: pan-y;
+      transition: background 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .track-strip:hover .swipe-content {
+      background: linear-gradient(var(--glass-surface), var(--glass-surface)), var(--modal-surface);
+    }
+
+    .track-strip.active-strip .swipe-content {
+      background: linear-gradient(rgba(var(--accent-rgb), 0.10), rgba(var(--accent-rgb), 0.10)), var(--modal-surface);
+    }
+
+    .track-main:active {
+      transform: scale(0.98);
+      transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .track-main {
@@ -370,6 +575,7 @@
       overflow: hidden;
       flex-shrink: 0;
       position: relative;
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.3);
     }
 
     .track-banner img {
@@ -406,24 +612,68 @@
     .track-actions {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 6px;
+    }
+
+    /* Drag handle — only rendered when viewing a specific playlist */
+    .drag-handle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      flex-shrink: 0;
+      color: var(--text-muted);
+      cursor: grab;
+      touch-action: none;
+      margin-right: -6px;
+    }
+
+    .drag-handle:active {
+      cursor: grabbing;
+    }
+
+    .track-strip.drag-lifted {
+      z-index: 50;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.4);
+      transform: scale(1.02);
+      transition: none;
+    }
+
+    .track-strip.drag-lifted .swipe-content {
+      transition: none;
     }
 
     .strip-control-btn {
-      background: transparent;
-      border: none;
+      background: var(--glass-surface);
+      border: 1px solid var(--glass-border);
       color: var(--text-muted);
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: color 0.2s, transform 0.2s;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    }
+    [data-theme="light"] .strip-control-btn {
+      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.5);
     }
     .strip-control-btn:hover {
       color: var(--text-main);
+      background: rgba(var(--accent-rgb), 0.12);
+      border-color: rgba(var(--accent-rgb), 0.3);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 14px rgba(var(--accent-rgb), 0.22);
+    }
+    .strip-control-btn:active {
+      transform: translateY(0) scale(0.92);
     }
     .strip-control-btn.btn-delete:hover {
       color: var(--danger-color);
+      background: rgba(255, 74, 74, 0.1);
+      border-color: rgba(255, 74, 74, 0.25);
     }
 
     /* --- ADVANCED PROGRESS BARS --- */
@@ -453,14 +703,16 @@
       position: absolute;
       top: 0;
       left: 0;
+      box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.6);
     }
 
     .track-duration {
       font-size: 12px;
       color: var(--text-muted);
-      font-weight: 500;
-      min-width: 35px;
+      font-weight: 600;
+      min-width: 42px;
       text-align: right;
+      font-variant-numeric: tabular-nums;
     }
 
     /* --- AUDIO ENGINE DOCK --- */
@@ -522,12 +774,46 @@
     .dock-play-ring {
       background: var(--accent-gradient);
       padding: 12px;
+      width: auto;
+      height: auto;
       border-radius: 50%;
       color: #ffffff !important;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 4px 15px rgba(var(--accent-rgb), 0.35);
+      box-shadow: 0 8px 22px rgba(var(--accent-rgb), 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.35), inset 0 -2px 4px rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .dock-play-ring svg {
+      flex-shrink: 0;
+      width: 18px;
+      height: 18px;
+    }
+
+    .dock-play-ring::after {
+      content: '';
+      position: absolute;
+      inset: -6px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(var(--accent-rgb), 0.35);
+      animation: playRingBreathe 2.6s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    @keyframes playRingBreathe {
+      0%, 100% { transform: scale(0.94); opacity: 0.55; }
+      50% { transform: scale(1.12); opacity: 0; }
+    }
+
+    .dock-play-ring:active {
+      transform: scale(0.93);
+    }
+
+    .dock-play-ring:hover {
+      box-shadow: 0 10px 26px rgba(var(--accent-rgb), 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.4), inset 0 -2px 4px rgba(0, 0, 0, 0.2);
     }
 
     /* --- WAVE VISUALIZER --- */
@@ -573,22 +859,42 @@
       animation: fadeInOverlay 0.3s ease forwards;
     }
 
+    [data-theme="light"] .now-playing-modal {
+      background: rgba(30, 27, 75, 0.28);
+    }
+
     .now-playing-card {
       width: 100%;
       max-width: 480px;
+      max-height: 92vh;
       background: linear-gradient(160deg, var(--modal-surface) 0%, var(--surface-color) 100%);
       border: 1px solid var(--modal-border);
       border-radius: 36px 36px 0 0;
-      padding: 16px 28px calc(36px + var(--safe-bottom));
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 22px;
       position: relative;
       overflow: hidden;
       box-shadow: 0 -20px 60px rgba(0, 0, 0, 0.5);
       animation: npSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
+
+    /* The scrollable layer is deliberately separate from .now-playing-card:
+       the card's ::before sheen extends far beyond its own box (inset:-50%),
+       and if the card itself were the scroll container, that oversized
+       decorative layer would inflate scrollHeight and show up as a long
+       stretch of empty scrollable space below the real content. */
+    .now-playing-scroll {
+      max-height: 92vh;
+      padding: 16px 28px calc(36px + var(--safe-bottom));
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 18px;
+      position: relative;
+      z-index: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+
+    .now-playing-scroll::-webkit-scrollbar { width: 0; }
 
     /* Reuses the app's signature liquid-glass sheen, just softened so it
        doesn't fight with the album art sitting on top of it. */
@@ -682,14 +988,232 @@
     .now-playing-controls {
       display: flex;
       align-items: center;
-      justify-content: center;
-      gap: 36px;
+      justify-content: space-between;
+      gap: 6px;
+      width: 100%;
       position: relative;
       z-index: 1;
     }
 
+    .np-toggle-btn {
+      position: relative;
+      color: var(--text-muted);
+    }
+
+    .np-toggle-btn.toggle-active {
+      color: #ffffff;
+      background: var(--accent-gradient);
+      border-color: transparent;
+      box-shadow: 0 6px 16px rgba(var(--accent-rgb), 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    }
+
+    .np-toggle-btn.repeat-one-mode::after {
+      content: '1';
+      position: absolute;
+      bottom: -3px;
+      right: -3px;
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      background: var(--gold-accent);
+      color: #1a1408;
+      font-size: 9px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+    }
+
+    /* --- Secondary Now Playing controls: speed, volume, sleep timer, queue --- */
+    .np-extra-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      width: 100%;
+      position: relative;
+      z-index: 1;
+    }
+
+    .np-extra-btn {
+      background: var(--glass-surface);
+      border: 1px solid var(--glass-border);
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 44px;
+      min-width: 44px;
+      padding: 0 16px;
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: -0.1px;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+    }
+
+    .np-extra-btn:hover {
+      color: var(--text-main);
+      background: rgba(var(--accent-rgb), 0.12);
+      border-color: rgba(var(--accent-rgb), 0.3);
+    }
+
+    .np-extra-btn:active {
+      transform: scale(0.93);
+    }
+
+    .np-extra-btn.toggle-active {
+      color: #ffffff;
+      background: var(--accent-gradient);
+      border-color: transparent;
+      box-shadow: 0 6px 14px rgba(var(--accent-rgb), 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.28);
+    }
+
+    .np-volume-panel {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      background: var(--glass-surface);
+      border: 1px solid var(--glass-border);
+      border-radius: 18px;
+      padding: 10px 16px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .np-volume-panel input[type="range"] {
+      flex-grow: 1;
+      -webkit-appearance: none;
+      appearance: none;
+      height: 4px;
+      border-radius: 3px;
+      background: var(--glass-border);
+      outline: none;
+    }
+
+    .np-volume-panel input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--accent-gradient);
+      box-shadow: 0 2px 8px rgba(var(--accent-rgb), 0.5), 0 0 0 3px var(--modal-surface);
+      cursor: pointer;
+    }
+
+    .np-volume-label {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--text-muted);
+      min-width: 28px;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Sleep timer duration picker */
+    .sleep-timer-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      width: 100%;
+    }
+
+    .sleep-timer-option {
+      background: var(--glass-surface);
+      border: 1px solid var(--glass-border);
+      color: var(--text-main);
+      padding: 12px 8px;
+      border-radius: 14px;
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .sleep-timer-option:hover {
+      border-color: rgba(var(--accent-rgb), 0.3);
+      background: rgba(var(--accent-rgb), 0.08);
+    }
+
+    .sleep-timer-option.selected {
+      background: var(--accent-gradient);
+      color: #ffffff;
+      border-color: transparent;
+      box-shadow: 0 6px 16px rgba(var(--accent-rgb), 0.35);
+    }
+
+    /* Up Next / Queue view */
+    .queue-current-row {
+      border-color: rgba(var(--accent-rgb), 0.4) !important;
+      background: rgba(var(--accent-rgb), 0.08) !important;
+    }
+
+    .queue-badge-playing {
+      font-size: 9px;
+      background: var(--accent-gradient);
+      color: #fff;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-weight: 700;
+      text-transform: uppercase;
+      flex-shrink: 0;
+    }
+
+    .queue-badge-next {
+      font-size: 9px;
+      background: var(--glass-surface);
+      border: 1px solid var(--glass-border);
+      color: var(--text-muted);
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-weight: 700;
+      text-transform: uppercase;
+      flex-shrink: 0;
+    }
+
+    /* Library search */
+    .library-search-row {
+      margin: -6px 0 16px;
+    }
+
+    .library-search-row input {
+      width: 100%;
+      background: var(--input-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      height: 46px;
+      padding: 0 16px;
+      color: var(--text-main);
+      font-size: 14px;
+      outline: none;
+    }
+
+    .library-search-row input:focus {
+      border-color: var(--accent-color);
+      box-shadow: 0 0 20px var(--border-glow);
+    }
+
+    .section-header-row .header-action-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
     .now-playing-play-ring {
       padding: 20px;
+      width: auto;
+      height: auto;
+    }
+
+    .now-playing-play-ring svg {
+      width: 22px;
+      height: 22px;
     }
 
     @keyframes npSlideUp {
@@ -854,7 +1378,7 @@
       height: 48px;
       font-size: 14px;
       font-weight: 700;
-      border-radius: 16px;
+      border-radius: 999px;
       cursor: pointer;
       box-shadow: 0 8px 24px rgba(255, 75, 43, 0.3);
       transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
@@ -873,7 +1397,7 @@
       height: 48px;
       font-size: 14px;
       font-weight: 700;
-      border-radius: 16px;
+      border-radius: 999px;
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -1193,12 +1717,97 @@
       background: var(--accent-gradient);
       color: #ffffff;
       border: none;
-      border-radius: 16px;
+      border-radius: 999px;
       padding: 0 18px;
       font-size: 14px;
       font-weight: 700;
       cursor: pointer;
       box-shadow: 0 4px 15px rgba(var(--accent-rgb), 0.3);
+    }
+
+    /* --- OWNER CREDIT OVERLAY: tapping the "Sonata" wordmark reveals this --- */
+    .owner-credit-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(3, 0, 20, 0.55);
+      backdrop-filter: blur(25px) saturate(180%);
+      -webkit-backdrop-filter: blur(25px) saturate(180%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2100;
+      padding: 24px;
+      animation: fadeInOverlay 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .owner-credit-box {
+      width: 100%;
+      max-width: 360px;
+      background: var(--modal-surface);
+      backdrop-filter: blur(30px) saturate(200%);
+      -webkit-backdrop-filter: blur(30px) saturate(200%);
+      border-radius: 28px;
+      padding: 32px 28px 28px;
+      text-align: center;
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.45),
+                  inset 0 1px 0 rgba(255, 255, 255, 0.12),
+                  inset 0 0 20px rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--modal-border);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      position: relative;
+      overflow: hidden;
+      animation: scaleUpBox 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .owner-credit-box::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle at center, rgba(var(--accent-rgb), 0.10) 0%, transparent 65%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .owner-credit-box > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .owner-credit-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: var(--accent-gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 10px 26px rgba(var(--accent-rgb), 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+      color: #ffffff;
+    }
+
+    .owner-credit-text {
+      font-size: 13.5px;
+      color: var(--text-muted);
+      line-height: 1.6;
+      font-weight: 500;
+    }
+
+    .owner-credit-name {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      background: var(--heading-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
 
     /* --- RESPONSIVE: tablet / laptop / desktop ---
@@ -1244,7 +1853,7 @@
     
     <header>
       <div class="logo-group">
-        <h1>Sonata</h1>
+        <h1 id="btn-owner-credit">Sonata</h1>
       </div>
       <div class="input-toggle-container">
         <button class="icon-btn" id="btn-toggle-search">
@@ -1258,7 +1867,7 @@
 
     <div class="search-expand-card hidden" id="search-expand-panel">
       <div class="search-expand-input-row">
-        <input type="text" id="yt-url-input" placeholder="Paste YouTube link...">
+        <input type="text" id="yt-url-input" placeholder="Paste YouTube video or playlist link...">
         <button class="icon-btn" id="btn-trigger-search" style="width:40px; height:40px;">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
         </button>
@@ -1283,10 +1892,28 @@
     <div class="tabs-scroll" id="dynamic-tabs-container">
       <div class="tab-item active" onclick="switchTab('all')" id="tab-all">All Tracks</div>
       <div class="tab-item" onclick="switchTab('favorites')" id="tab-favorites">Favorites</div>
+      <div class="tab-item" onclick="switchTab('recent')" id="tab-recent">Recent</div>
     </div>
 
     <div>
-      <div class="track-section-title" id="section-view-title">All Tracks</div>
+      <div class="section-header-row">
+        <div class="track-section-title" id="section-view-title">All Tracks</div>
+        <div class="header-action-group">
+          <button class="icon-btn" id="btn-toggle-library-search" style="width:38px; height:38px;" title="Search your library">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          </button>
+          <button class="icon-btn" id="btn-open-queue-view" style="width:38px; height:38px;" title="Up Next">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="15" y2="18"></line><circle cx="4" cy="6" r="1.5" fill="currentColor" stroke="none"></circle><circle cx="4" cy="12" r="1.5" fill="currentColor" stroke="none"></circle><circle cx="4" cy="18" r="1.5" fill="currentColor" stroke="none"></circle></svg>
+          </button>
+          <button class="play-all-btn" id="btn-play-all">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+            Play All
+          </button>
+        </div>
+      </div>
+      <div class="library-search-row hidden" id="library-search-row">
+        <input type="text" id="library-search-input" placeholder="Search your library..." autocomplete="off" spellcheck="false">
+      </div>
       <div class="track-list" id="track-container-list"></div>
     </div>
 
@@ -1324,6 +1951,7 @@
 
   <div class="now-playing-modal hidden" id="modal-now-playing">
     <div class="now-playing-card">
+      <div class="now-playing-scroll">
       <div class="now-playing-handle" id="np-handle"></div>
       <div class="now-playing-art-wrap">
         <img id="np-art" class="now-playing-art" src="" alt="Album Art" onerror="this.onerror=null; this.src=this.src.replace('maxresdefault','hqdefault');">
@@ -1341,6 +1969,9 @@
         </div>
       </div>
       <div class="now-playing-controls">
+        <button class="strip-control-btn np-toggle-btn" id="np-btn-shuffle" title="Shuffle">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg>
+        </button>
         <button class="strip-control-btn" id="np-btn-prev">
           <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><polygon points="19 20 9 12 19 4 19 20"></polygon><line x1="5" y1="4" x2="5" y2="20" stroke="currentColor" stroke-width="2"></line></svg>
         </button>
@@ -1350,7 +1981,63 @@
         <button class="strip-control-btn" id="np-btn-next">
           <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 4 15 12 5 20 5 4"></polygon><line x1="19" y1="4" x2="19" y2="20" stroke="currentColor" stroke-width="2"></line></svg>
         </button>
+        <button class="strip-control-btn np-toggle-btn" id="np-btn-repeat" title="Repeat">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><polyline points="7 23 3 19 7 15"></polyline><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg>
+        </button>
       </div>
+
+      <div class="np-extra-row">
+        <button class="np-extra-btn" id="np-btn-speed" title="Playback speed">1x</button>
+        <button class="np-extra-btn" id="np-btn-volume" title="Volume">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="np-volume-icon"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path></svg>
+        </button>
+        <button class="np-extra-btn" id="np-btn-sleep" title="Sleep timer">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        </button>
+      </div>
+
+      <div class="np-volume-panel hidden" id="np-volume-panel">
+        <button class="strip-control-btn" id="np-btn-mute" style="width:36px; height:36px; flex-shrink:0;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="np-mute-icon"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+        </button>
+        <input type="range" id="np-volume-slider" min="0" max="100" value="100">
+        <span class="np-volume-label" id="np-volume-label">100</span>
+      </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="delete-confirmation-modal hidden" id="modal-sleep-timer">
+    <div class="delete-confirmation-box rename-box">
+      <h2>Sleep Timer</h2>
+      <p id="sleep-timer-status">Music will pause automatically once the timer runs out.</p>
+      <div class="sleep-timer-grid" id="sleep-timer-options">
+        <button class="sleep-timer-option" data-minutes="10">10 min</button>
+        <button class="sleep-timer-option" data-minutes="15">15 min</button>
+        <button class="sleep-timer-option" data-minutes="30">30 min</button>
+        <button class="sleep-timer-option" data-minutes="45">45 min</button>
+        <button class="sleep-timer-option" data-minutes="60">60 min</button>
+        <button class="sleep-timer-option" data-minutes="end">End of track</button>
+      </div>
+      <div class="delete-modal-actions">
+        <div class="delete-cancel-lnk" id="btn-cancel-sleep-timer">Close</div>
+        <button class="delete-confirm-btn rename-confirm-btn" id="btn-clear-sleep-timer">Turn Off</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="albums-modal hidden" id="modal-queue-view">
+    <div class="albums-content">
+      <div class="albums-header">
+        <div>
+          <h3 style="font-weight: 800; font-size: 19px; letter-spacing: -0.5px;">Up Next</h3>
+          <p style="font-size: 11px; color: var(--text-muted); margin-top: 2px;" id="queue-view-subtitle">Nothing queued yet</p>
+        </div>
+        <button class="icon-btn" id="btn-close-queue-view" style="width:36px; height:36px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+      <div class="albums-list-container" id="queue-view-list"></div>
     </div>
   </div>
 
@@ -1383,6 +2070,33 @@
         <button class="icon-btn" id="btn-toggle-video" style="color: var(--accent-color); width:36px; height:36px;">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="eye-icon-svg"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
         </button>
+      </div>
+
+      <div class="setting-row-vertical">
+        <span class="setting-label">Backup &amp; Restore</span>
+        <div style="display:flex; gap:10px;">
+          <button class="playlist-create-btn" id="btn-export-library" style="flex:1; background: var(--glass-surface); color: var(--text-main); box-shadow:none; border:1px solid var(--glass-border); display:flex; align-items:center; justify-content:center; gap:6px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            Export
+          </button>
+          <button class="playlist-create-btn" id="btn-trigger-import" style="flex:1; display:flex; align-items:center; justify-content:center; gap:6px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+            Import
+          </button>
+        </div>
+        <input type="file" id="import-file-input" accept="application/json,.json" class="hidden">
+      </div>
+    </div>
+  </div>
+
+  <div class="delete-confirmation-modal hidden" id="modal-import-confirm">
+    <div class="delete-confirmation-box">
+      <h2>Import Library?</h2>
+      <p>This will replace your current tracks and playlists with the backup file's contents. This can't be undone.</p>
+      <span class="delete-target-meta" id="import-summary-text">0 tracks, 0 playlists</span>
+      <div class="delete-modal-actions">
+        <div class="delete-cancel-lnk" id="btn-cancel-import">Cancel</div>
+        <button class="delete-confirm-btn" id="btn-confirm-import">Replace</button>
       </div>
     </div>
   </div>
@@ -1482,6 +2196,17 @@
     </div>
   </div>
 
+  <div class="owner-credit-modal hidden" id="modal-owner-credit">
+    <div class="owner-credit-box">
+      <div class="owner-credit-icon">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.9 6.26L21 9.27l-4.5 4.39L17.8 21 12 17.77 6.2 21l1.3-7.34L3 9.27l6.1-1.01L12 2z"></path></svg>
+      </div>
+      <p class="owner-credit-text">This web app was designed and modified exclusively for its owner:</p>
+      <h2 class="owner-credit-name">Reymark Delagao</h2>
+      <div class="delete-cancel-lnk" id="btn-close-owner-credit" style="width:100%;">Close</div>
+    </div>
+  </div>
+
   <script>
     // System Configurations Injectors
     const YOUTUBE_API_KEY = "AIzaSyA58g8LJy4f_TiLuv-w61c8vEkq0TJnKhw";
@@ -1516,6 +2241,34 @@
     let trackTargetedForPlaylist = null;
     let renameContext = null;        // { playlistId }
 
+    // Shuffle / Repeat playback engine
+    let isShuffleOn = (localStorage.getItem('sonata_shuffle') === '1');
+    let repeatMode = localStorage.getItem('sonata_repeat') || 'off'; // 'off' | 'all' | 'one'
+    let shuffleOrder = []; // holds a randomized array of activeQueue indices when shuffle is on
+
+    // Playback speed
+    const SPEED_STEPS = [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2];
+    let playbackSpeed = parseFloat(localStorage.getItem('sonata_speed')) || 1;
+    if (!SPEED_STEPS.includes(playbackSpeed)) playbackSpeed = 1;
+
+    // Volume
+    let currentVolume = parseInt(localStorage.getItem('sonata_volume'));
+    if (isNaN(currentVolume)) currentVolume = 100;
+    let lastVolumeBeforeMute = 70;
+
+    // Sleep timer
+    let sleepTimerMode = null;   // null | <minutes number> | 'end'
+    let sleepTimerHandle = null;
+
+    // Library search (filters whatever tab/playlist is currently open)
+    let librarySearchQuery = '';
+
+    // Recently played history — most-recent-first list of track ids
+    let recentlyPlayed = JSON.parse(localStorage.getItem('sonata_recent') || '[]');
+
+    // Backup import — holds the parsed file contents while the user confirms
+    let pendingImportData = null;
+
     document.addEventListener("DOMContentLoaded", () => {
       setupDomListeners();
       setupCloudEventBridge();
@@ -1524,6 +2277,10 @@
       renderAppMetrics();
       reconstructTabEngineBars();
       renderTracksDashboard();
+      syncShuffleRepeatButtons();
+      updateSpeedButtonLabel();
+      updateVolumeUI();
+      updateSleepTimerBadge();
       initNetworkAgent();
       registerServiceWorker();
     });
@@ -1572,6 +2329,15 @@
       } else {
         panel.classList.add('hidden');
       }
+    }
+
+    // --- OWNER CREDIT OVERLAY: tapping the "Sonata" wordmark ---
+    function openOwnerCreditModal() {
+      document.getElementById('modal-owner-credit').classList.remove('hidden');
+    }
+
+    function closeOwnerCreditModal() {
+      document.getElementById('modal-owner-credit').classList.add('hidden');
     }
 
     // --- NOW PLAYING: full liquid-glass player card, opened from the dock ---
@@ -1741,6 +2507,13 @@
         document.getElementById('modal-settings').classList.add('hidden');
       });
 
+      // Owner credit overlay — tap the "Sonata" wordmark
+      document.getElementById('btn-owner-credit').addEventListener('click', openOwnerCreditModal);
+      document.getElementById('btn-close-owner-credit').addEventListener('click', closeOwnerCreditModal);
+      document.getElementById('modal-owner-credit').addEventListener('click', (e) => {
+        if (e.target.id === 'modal-owner-credit') closeOwnerCreditModal();
+      });
+
       // Playlist Modals Setup Execution
       document.getElementById('btn-close-playlists-modal').addEventListener('click', () => {
         document.getElementById('modal-playlist-orchestrator').classList.add('hidden');
@@ -1768,7 +2541,57 @@
       });
 
       document.getElementById('card-trigger-albums').addEventListener('click', openYoutubeAlbumsModal);
+
+      // Play All / Shuffle / Repeat
+      document.getElementById('btn-play-all').addEventListener('click', executePlayAllWorkflow);
+      document.getElementById('np-btn-shuffle').addEventListener('click', toggleShuffle);
+      document.getElementById('np-btn-repeat').addEventListener('click', cycleRepeatMode);
       document.getElementById('btn-close-albums').addEventListener('click', closeYoutubeAlbumsModal);
+
+      // Playback speed
+      document.getElementById('np-btn-speed').addEventListener('click', cyclePlaybackSpeed);
+
+      // Volume
+      document.getElementById('np-btn-volume').addEventListener('click', toggleVolumePanel);
+      document.getElementById('np-btn-mute').addEventListener('click', toggleMute);
+      document.getElementById('np-volume-slider').addEventListener('input', (e) => {
+        setPlayerVolume(parseInt(e.target.value, 10));
+      });
+
+      // Sleep timer
+      document.getElementById('np-btn-sleep').addEventListener('click', openSleepTimerModal);
+      document.getElementById('btn-cancel-sleep-timer').addEventListener('click', closeSleepTimerModal);
+      document.getElementById('btn-clear-sleep-timer').addEventListener('click', () => clearSleepTimer(true));
+      document.getElementById('modal-sleep-timer').addEventListener('click', (e) => {
+        if (e.target.id === 'modal-sleep-timer') closeSleepTimerModal();
+      });
+      document.querySelectorAll('.sleep-timer-option').forEach(btn => {
+        btn.addEventListener('click', () => selectSleepTimerOption(btn.getAttribute('data-minutes')));
+      });
+
+      // Up Next / Queue view
+      document.getElementById('btn-open-queue-view').addEventListener('click', openQueueViewModal);
+      document.getElementById('btn-close-queue-view').addEventListener('click', closeQueueViewModal);
+      document.getElementById('modal-queue-view').addEventListener('click', (e) => {
+        if (e.target.id === 'modal-queue-view') closeQueueViewModal();
+      });
+
+      // Library search
+      document.getElementById('btn-toggle-library-search').addEventListener('click', toggleLibrarySearchPanel);
+      document.getElementById('library-search-input').addEventListener('input', (e) => {
+        librarySearchQuery = e.target.value.trim().toLowerCase();
+        renderTracksDashboard();
+      });
+
+      // Backup & Restore
+      document.getElementById('btn-export-library').addEventListener('click', exportLibraryBackupFile);
+      document.getElementById('btn-trigger-import').addEventListener('click', triggerImportFilePicker);
+      document.getElementById('import-file-input').addEventListener('change', handleImportFileSelected);
+      document.getElementById('btn-cancel-import').addEventListener('click', closeImportConfirmModal);
+      document.getElementById('btn-confirm-import').addEventListener('click', confirmImportLibrary);
+      document.getElementById('modal-import-confirm').addEventListener('click', (e) => {
+        if (e.target.id === 'modal-import-confirm') closeImportConfirmModal();
+      });
 
       // 10X Unified Delete Confirmation (replaces window.confirm for tracks AND playlists)
       document.getElementById('btn-cancel-delete-close').addEventListener('click', closeDeleteConfirmationModal);
@@ -1790,6 +2613,18 @@
         }
         if(!document.getElementById('modal-now-playing').classList.contains('hidden')) {
           closeNowPlayingCard();
+        }
+        if(!document.getElementById('modal-owner-credit').classList.contains('hidden')) {
+          closeOwnerCreditModal();
+        }
+        if(!document.getElementById('modal-sleep-timer').classList.contains('hidden')) {
+          closeSleepTimerModal();
+        }
+        if(!document.getElementById('modal-queue-view').classList.contains('hidden')) {
+          closeQueueViewModal();
+        }
+        if(!document.getElementById('modal-import-confirm').classList.contains('hidden')) {
+          closeImportConfirmModal();
         }
         if(!document.getElementById('search-expand-panel').classList.contains('hidden')) {
           document.getElementById('search-expand-panel').classList.add('hidden');
@@ -1931,6 +2766,12 @@
     }
 
     function parseAndCommitYoutubeUrl(url) {
+      const playlistMatch = url.match(/[?&]list=([^#&?]+)/);
+      if (playlistMatch && playlistMatch[1]) {
+        importYoutubePlaylistById(playlistMatch[1]);
+        return;
+      }
+
       const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|shorts\/)([^#\&\?]*).*/;
       const match = url.match(regExp);
       const videoId = (match && match[2].length === 11) ? match[2] : null;
@@ -1953,6 +2794,43 @@
       renderTracksDashboard();
     }
 
+    // Bulk-imports every video in a YouTube playlist by paginating through
+    // the Data API, skipping anything already in the library.
+    async function importYoutubePlaylistById(playlistId) {
+      triggerSystemToast("Importing playlist...");
+      let addedCount = 0;
+      let pageToken = '';
+
+      try {
+        do {
+          const url = `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=${playlistId}&key=${YOUTUBE_API_KEY}${pageToken ? '&pageToken=' + pageToken : ''}`;
+          const response = await fetch(url);
+          if (!response.ok) throw new Error("Playlist fetch failed");
+          const data = await response.json();
+
+          (data.items || []).forEach(item => {
+            const snippet = item.snippet;
+            const videoId = snippet && snippet.resourceId ? snippet.resourceId.videoId : null;
+            if (!videoId || trackLibrary.some(t => t.id === videoId)) return;
+            const newTrack = { id: videoId, title: snippet.title || "Imported Track", type: 'online', favorite: false };
+            trackLibrary.push(newTrack);
+            syncToCloud(() => window.SonataCloud.saveTrack(newTrack));
+            addedCount++;
+          });
+
+          pageToken = data.nextPageToken || '';
+        } while (pageToken);
+
+        localStorage.setItem('sonata_library', JSON.stringify(trackLibrary));
+        renderAppMetrics();
+        renderTracksDashboard();
+        triggerSystemToast(addedCount > 0 ? `Imported ${addedCount} track${addedCount === 1 ? '' : 's'} from playlist` : "Playlist tracks were already in your library");
+      } catch (err) {
+        console.error(err);
+        triggerSystemToast("Couldn't import that playlist");
+      }
+    }
+
     function renderAppMetrics() {
       document.getElementById('cnt-album').innerText = "1";
       document.getElementById('cnt-playlists').innerText = playlistLibrary.length;
@@ -1963,6 +2841,7 @@
       tabsContainer.innerHTML = `
         <div class="tab-item ${currentTabIndex === 'all' ? 'active' : ''}" onclick="switchTab('all')" id="tab-all">All Tracks</div>
         <div class="tab-item ${currentTabIndex === 'favorites' ? 'active' : ''}" onclick="switchTab('favorites')" id="tab-favorites">Favorites</div>
+        <div class="tab-item ${currentTabIndex === 'recent' ? 'active' : ''}" onclick="switchTab('recent')" id="tab-recent">Recent</div>
       `;
     }
 
@@ -2124,6 +3003,8 @@
         document.getElementById('section-view-title').innerText = "All Tracks";
       } else if(targetTab === 'favorites') {
         document.getElementById('section-view-title').innerText = "Favorites Tracks";
+      } else if(targetTab === 'recent') {
+        document.getElementById('section-view-title').innerText = "Recently Played";
       } else if(targetTab.startsWith('playlist-')) {
         const id = targetTab.replace('playlist-', '');
         const targetPlaylist = playlistLibrary.find(p => p.id === id);
@@ -2132,30 +3013,54 @@
       renderTracksDashboard();
     }
 
+    // Single source of truth for "what tracks does the current tab show" —
+    // reused by rendering, track selection, and Play All so they can never
+    // drift out of sync with each other.
+    function getFilteredTrackSubset() {
+      let subset;
+      if (currentTabIndex === 'all') {
+        subset = [...trackLibrary];
+      } else if (currentTabIndex === 'favorites') {
+        subset = [...trackLibrary].filter(t => t.favorite);
+      } else if (currentTabIndex === 'recent') {
+        subset = recentlyPlayed.map(id => trackLibrary.find(t => t.id === id)).filter(Boolean);
+      } else if (currentTabIndex.startsWith('playlist-')) {
+        const pId = currentTabIndex.replace('playlist-', '');
+        const activePlaylistNode = playlistLibrary.find(p => p.id === pId);
+        subset = activePlaylistNode ? trackLibrary.filter(track => activePlaylistNode.tracks.includes(track.id)) : [];
+      } else {
+        subset = [...trackLibrary];
+      }
+
+      if (librarySearchQuery) {
+        subset = subset.filter(t => t.title.toLowerCase().includes(librarySearchQuery));
+      }
+      return subset;
+    }
+
     function renderTracksDashboard() {
       const container = document.getElementById('track-container-list');
       if (!container) return;
       container.innerHTML = "";
-      let filteringSubset = [];
-
-      if (currentTabIndex === 'all') {
-        filteringSubset = [...trackLibrary];
-      } else if (currentTabIndex === 'favorites') {
-        filteringSubset = [...trackLibrary].filter(t => t.favorite);
-      } else if (currentTabIndex.startsWith('playlist-')) {
-        const pId = currentTabIndex.replace('playlist-', '');
-        const activePlaylistNode = playlistLibrary.find(p => p.id === pId);
-        if(activePlaylistNode) {
-          filteringSubset = trackLibrary.filter(track => activePlaylistNode.tracks.includes(track.id));
-        }
-      }
+      const filteringSubset = getFilteredTrackSubset();
 
       if(filteringSubset.length === 0) {
-        container.innerHTML = `<div style="color:var(--text-muted); font-size:14px; padding:10px;">Index workspace empty.</div>`;
+        let message = librarySearchQuery ? `No matches for "${librarySearchQuery}".` : "Index workspace empty.";
+        if (!librarySearchQuery && currentTabIndex === 'recent') message = "Nothing played yet — your history shows up here.";
+        container.innerHTML = `<div style="color:var(--text-muted); font-size:14px; padding:10px;">${message}</div>`;
         return;
       }
       
       filteringSubset.forEach(track => { container.appendChild(createTrackStripNode(track)); });
+    }
+
+    // Keeps a most-recent-first history of played track ids (capped at 50).
+    function recordRecentlyPlayed(trackId) {
+      recentlyPlayed = recentlyPlayed.filter(id => id !== trackId);
+      recentlyPlayed.unshift(trackId);
+      if (recentlyPlayed.length > 50) recentlyPlayed = recentlyPlayed.slice(0, 50);
+      localStorage.setItem('sonata_recent', JSON.stringify(recentlyPlayed));
+      if (currentTabIndex === 'recent') renderTracksDashboard();
     }
 
     // Dynamic Playlist Context Architecture
@@ -2238,6 +3143,7 @@
 
     function createTrackStripNode(track) {
       const isActive = (activeQueue[activeQueuePointer] && activeQueue[activeQueuePointer].id === track.id);
+      const isPlaylistView = currentTabIndex.startsWith('playlist-');
       const strip = document.createElement('div');
       strip.className = `track-strip ${isActive ? 'active-strip' : ''}`;
       strip.id = `strip-target-${track.id}`;
@@ -2245,59 +3151,499 @@
       const thumbnailSrc = `https://img.youtube.com/vi/${track.id}/hqdefault.jpg`;
 
       strip.innerHTML = `
-        <div class="track-main" onclick="bootstrapSelectedTrack('${track.id}')">
-          <div class="track-banner">
-            <img src="${thumbnailSrc}" alt="Cover Thumbnail">
-          </div>
-          <div class="track-details">
-            <div class="track-title">${track.title}</div>
-            <div class="track-status">${isActive ? 'Now Playing' : 'Not Playing'}</div>
-          </div>
-          <div class="track-actions" onclick="event.stopPropagation();">
-            <button class="strip-control-btn" onclick="openPlaylistInterfacingPipeline('${track.id}')" title="Manage Playlists" style="color: var(--accent-color); margin-right: 2px;">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
-            </button>
-            <button class="strip-control-btn" onclick="toggleFavoriteAction('${track.id}')" title="Favorite">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="${track.favorite ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" style="${track.favorite ? 'color:#ef4444;' : ''}"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-            </button>
-            <button class="strip-control-btn" onclick="executeExternalDownloadConverter('${track.id}')" title="Download">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-            </button>
-            <button class="strip-control-btn" onclick="triggerTrackDeletionPipeline('${track.id}')" title="Delete Track">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
-            </button>
-          </div>
+        <div class="swipe-bg swipe-bg-favorite">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+          <span>${track.favorite ? 'Unfavorite' : 'Favorite'}</span>
         </div>
-        ${isActive ? `
-        <div class="track-progress-container" onclick="event.stopPropagation();">
-          <div class="track-progress-bar" onclick="seekTrackFromStrip(event)">
-            <div class="track-progress-fill" id="strip-fill-node"></div>
-          </div>
-          <span class="track-duration" id="strip-duration-node">0:00</span>
+        <div class="swipe-bg swipe-bg-delete">
+          <span>Delete</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
         </div>
-        ` : ''}
+        <div class="swipe-content" id="swipe-content-${track.id}">
+          <div class="track-main" onclick="bootstrapSelectedTrack('${track.id}')">
+            ${isPlaylistView ? `
+            <div class="drag-handle" title="Drag to reorder">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.6"></circle><circle cx="15" cy="6" r="1.6"></circle><circle cx="9" cy="12" r="1.6"></circle><circle cx="15" cy="12" r="1.6"></circle><circle cx="9" cy="18" r="1.6"></circle><circle cx="15" cy="18" r="1.6"></circle></svg>
+            </div>
+            ` : ''}
+            <div class="track-banner">
+              <img src="${thumbnailSrc}" alt="Cover Thumbnail">
+            </div>
+            <div class="track-details">
+              <div class="track-title">${track.title}</div>
+              <div class="track-status">${isActive ? 'Now Playing' : 'Not Playing'}</div>
+            </div>
+            <div class="track-actions" onclick="event.stopPropagation();">
+              <button class="strip-control-btn" onclick="openPlaylistInterfacingPipeline('${track.id}')" title="Manage Playlists" style="color: var(--accent-color);">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="14" y2="6"></line><line x1="3" y1="11" x2="14" y2="11"></line><line x1="3" y1="16" x2="10" y2="16"></line><circle cx="18.5" cy="17.5" r="4.5"></circle><line x1="18.5" y1="15.5" x2="18.5" y2="19.5"></line><line x1="16.5" y1="17.5" x2="20.5" y2="17.5"></line></svg>
+              </button>
+              <button class="strip-control-btn" onclick="executeExternalDownloadConverter('${track.id}')" title="Download">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+              </button>
+            </div>
+          </div>
+          ${isActive ? `
+          <div class="track-progress-container" onclick="event.stopPropagation();">
+            <div class="track-progress-bar" onclick="seekTrackFromStrip(event)">
+              <div class="track-progress-fill" id="strip-fill-node"></div>
+            </div>
+            <span class="track-duration" id="strip-duration-node">0:00</span>
+          </div>
+          ` : ''}
+        </div>
       `;
+
+      attachSwipeHandlers(strip, track.id);
+      if (isPlaylistView) attachDragReorderHandlers(strip, track.id);
+
       return strip;
     }
 
-    function bootstrapSelectedTrack(trackId) {
-      if (currentTabIndex === 'favorites') {
-        activeQueue = [...trackLibrary].filter(t => t.favorite);
-      } else if (currentTabIndex.startsWith('playlist-')) {
-        const pId = currentTabIndex.replace('playlist-', '');
-        const targetP = playlistLibrary.find(p => p.id === pId);
-        activeQueue = targetP ? trackLibrary.filter(t => targetP.tracks.includes(t.id)) : [...trackLibrary];
-      } else {
-        activeQueue = [...trackLibrary];
+    // --- SWIPE GESTURES: swipe right to favorite, swipe left to delete ---
+    function attachSwipeHandlers(stripEl, trackId) {
+      const content = stripEl.querySelector('.swipe-content');
+      if (!content) return;
+      const THRESHOLD = 72;
+      const MAX_SWIPE = 104;
+      const DEADZONE = 8; // ignore tiny jitter so a plain tap isn't mistaken for a swipe
+      let startX = 0;
+      let deltaX = 0;
+      let pointerActive = false; // from pointerdown until release
+      let dragging = false;      // only true once real horizontal movement is confirmed
+      let capturedId = null;
+
+      content.addEventListener('pointerdown', (e) => {
+        if (e.target.closest('.strip-control-btn') || e.target.closest('.track-progress-bar') || e.target.closest('.drag-handle')) return;
+        pointerActive = true;
+        dragging = false;
+        startX = e.clientX;
+        deltaX = 0;
+        capturedId = e.pointerId;
+        content.style.transition = 'none';
+        // Deliberately NOT capturing the pointer here — capturing on every
+        // tap retargets the eventual click to this element instead of the
+        // nested track-main, which silently breaks tapping a track to play
+        // it. We only capture once movement proves this is really a swipe.
+      });
+
+      content.addEventListener('pointermove', (e) => {
+        if (!pointerActive) return;
+        const rawDelta = e.clientX - startX;
+        if (!dragging) {
+          if (Math.abs(rawDelta) < DEADZONE) return;
+          dragging = true;
+          try { content.setPointerCapture(capturedId); } catch (err) {}
+        }
+        deltaX = rawDelta;
+        const clamped = Math.max(-MAX_SWIPE, Math.min(MAX_SWIPE, deltaX));
+        content.style.transform = `translateX(${clamped}px)`;
+      });
+
+      function releaseSwipe() {
+        if (!pointerActive) return;
+        pointerActive = false;
+        content.style.transition = '';
+        content.style.transform = 'translateX(0)';
+        if (dragging) {
+          if (deltaX > THRESHOLD) {
+            toggleFavoriteAction(trackId);
+          } else if (deltaX < -THRESHOLD) {
+            triggerTrackDeletionPipeline(trackId);
+          }
+        }
+        dragging = false;
+        deltaX = 0;
       }
-      
+
+      content.addEventListener('pointerup', releaseSwipe);
+      content.addEventListener('pointercancel', releaseSwipe);
+    }
+
+    // --- DRAG TO REORDER: only active while viewing a specific playlist ---
+    let dragReorderState = null;
+
+    function attachDragReorderHandlers(stripEl, trackId) {
+      const handle = stripEl.querySelector('.drag-handle');
+      if (!handle) return;
+
+      handle.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dragReorderState = {
+          trackId,
+          playlistId: currentTabIndex.replace('playlist-', ''),
+          startY: e.clientY
+        };
+        stripEl.classList.add('drag-lifted');
+        // Capturing on the handle itself (which never moves in the DOM
+        // during the drag) — moving stripEl mid-drag was silently dropping
+        // pointer capture, since a DOM move technically detaches + re-adds
+        // the node, and browsers release capture on detach.
+        try { handle.setPointerCapture(e.pointerId); } catch (err) {}
+      });
+
+      handle.addEventListener('pointermove', (e) => {
+        if (!dragReorderState || dragReorderState.trackId !== trackId) return;
+        const deltaY = e.clientY - dragReorderState.startY;
+        stripEl.style.transform = `translateY(${deltaY}px) scale(1.02)`;
+      });
+
+      function releaseDrag(e) {
+        if (!dragReorderState || dragReorderState.trackId !== trackId) return;
+        stripEl.classList.remove('drag-lifted');
+        stripEl.style.transform = '';
+
+        // The one and only DOM move happens here, after we're done reading
+        // pointer events for this interaction — so losing capture as a
+        // side effect no longer matters.
+        const container = document.getElementById('track-container-list');
+        const siblings = Array.from(container.querySelectorAll('.track-strip')).filter(el => el !== stripEl);
+        const pointerY = e.clientY;
+        let targetNode = null;
+        for (const sib of siblings) {
+          const rect = sib.getBoundingClientRect();
+          const midY = rect.top + rect.height / 2;
+          if (pointerY < midY) { targetNode = sib; break; }
+        }
+        if (targetNode) {
+          container.insertBefore(stripEl, targetNode);
+        } else {
+          container.appendChild(stripEl);
+        }
+
+        finalizePlaylistReorder(dragReorderState.playlistId);
+        dragReorderState = null;
+      }
+
+      handle.addEventListener('pointerup', releaseDrag);
+      handle.addEventListener('pointercancel', releaseDrag);
+    }
+
+    function finalizePlaylistReorder(playlistId) {
+      const playlist = playlistLibrary.find(p => p.id === playlistId);
+      if (!playlist) return;
+      const container = document.getElementById('track-container-list');
+      if (!container) return;
+      const newOrderIds = Array.from(container.querySelectorAll('.track-strip')).map(el => el.id.replace('strip-target-', ''));
+      // Defensive: keep only ids this playlist actually has, in the new visual order
+      const reordered = newOrderIds.filter(id => playlist.tracks.includes(id));
+      if (reordered.length !== playlist.tracks.length) return; // something didn't line up — bail out safely
+      playlist.tracks = reordered;
+      localStorage.setItem('sonata_playlists', JSON.stringify(playlistLibrary));
+      syncToCloud(() => window.SonataCloud.savePlaylist(playlist));
+      triggerSystemToast("Playlist order updated");
+    }
+
+    function bootstrapSelectedTrack(trackId) {
+      activeQueue = getFilteredTrackSubset();
       activeQueuePointer = activeQueue.findIndex(t => t.id === trackId);
+      if (isShuffleOn) rebuildShuffleOrder();
       executeAudioStreamPipeline(activeQueue[activeQueuePointer]);
+    }
+
+    // "Play All" — queues up everything in the currently viewed tab
+    // (All Tracks / Favorites / a specific playlist) and starts from the top.
+    function executePlayAllWorkflow() {
+      const subset = getFilteredTrackSubset();
+      if (subset.length === 0) {
+        triggerSystemToast("Nothing to play here yet");
+        return;
+      }
+      activeQueue = subset;
+      activeQueuePointer = 0;
+      if (isShuffleOn) rebuildShuffleOrder();
+      executeAudioStreamPipeline(activeQueue[activeQueuePointer]);
+    }
+
+    // Builds a randomized traversal order over the current activeQueue.
+    // The currently-playing track (if any) is pinned to the front so
+    // turning shuffle on mid-playback doesn't yank you to a different song.
+    function rebuildShuffleOrder() {
+      shuffleOrder = activeQueue.map((_, i) => i);
+      for (let i = shuffleOrder.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffleOrder[i], shuffleOrder[j]] = [shuffleOrder[j], shuffleOrder[i]];
+      }
+      if (activeQueuePointer > -1) {
+        const curPos = shuffleOrder.indexOf(activeQueuePointer);
+        if (curPos > -1) {
+          shuffleOrder.splice(curPos, 1);
+          shuffleOrder.unshift(activeQueuePointer);
+        }
+      }
+    }
+
+    // Resolves the activeQueue index to play next/previous, honoring
+    // shuffle order. `wrapAlways=true` is for manual prev/next taps (always
+    // cycle); `wrapAlways=false` is for auto-advance on track end, where a
+    // finished queue with repeat off should stop instead of looping.
+    function computeAdjacentIndex(direction, wrapAlways) {
+      if (activeQueue.length === 0) return -1;
+
+      if (isShuffleOn) {
+        if (shuffleOrder.length !== activeQueue.length) rebuildShuffleOrder();
+        let pos = shuffleOrder.indexOf(activeQueuePointer);
+        if (pos === -1) pos = 0;
+        pos += direction;
+        if (pos < 0) pos = shuffleOrder.length - 1;
+        if (pos >= shuffleOrder.length) {
+          if (wrapAlways || repeatMode === 'all') {
+            rebuildShuffleOrder();
+            pos = 0;
+          } else {
+            return -1;
+          }
+        }
+        return shuffleOrder[pos];
+      }
+
+      let idx = activeQueuePointer + direction;
+      if (idx < 0) idx = activeQueue.length - 1;
+      if (idx >= activeQueue.length) {
+        if (wrapAlways || repeatMode === 'all') {
+          idx = 0;
+        } else {
+          return -1;
+        }
+      }
+      return idx;
+    }
+
+    function toggleShuffle() {
+      isShuffleOn = !isShuffleOn;
+      localStorage.setItem('sonata_shuffle', isShuffleOn ? '1' : '0');
+      if (isShuffleOn) rebuildShuffleOrder();
+      syncShuffleRepeatButtons();
+      triggerSystemToast(isShuffleOn ? "Shuffle on" : "Shuffle off");
+    }
+
+    function cycleRepeatMode() {
+      repeatMode = repeatMode === 'off' ? 'all' : repeatMode === 'all' ? 'one' : 'off';
+      localStorage.setItem('sonata_repeat', repeatMode);
+      syncShuffleRepeatButtons();
+      const labels = { off: "Repeat off", all: "Repeat all", one: "Repeat one song" };
+      triggerSystemToast(labels[repeatMode]);
+    }
+
+    function syncShuffleRepeatButtons() {
+      const shuffleBtn = document.getElementById('np-btn-shuffle');
+      const repeatBtn = document.getElementById('np-btn-repeat');
+      if (shuffleBtn) shuffleBtn.classList.toggle('toggle-active', isShuffleOn);
+      if (repeatBtn) {
+        repeatBtn.classList.toggle('toggle-active', repeatMode !== 'off');
+        repeatBtn.classList.toggle('repeat-one-mode', repeatMode === 'one');
+      }
+    }
+
+    // Called when the auto-advance chain (queue end, repeat off) runs out
+    // of tracks — pauses cleanly instead of silently doing nothing.
+    function stopPlaybackAtQueueEnd() {
+      if (ytPlayer && ytPlayer.pauseVideo) ytPlayer.pauseVideo();
+      clearInterval(timelineUpdateInterval);
+      document.getElementById('dock-wave').classList.remove('playing');
+      document.getElementById('dock-btn-play').innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>`;
+      updateMediaSessionPlaybackState('paused');
+      syncNowPlayingPlayButton();
+      triggerSystemToast("Queue finished");
+    }
+
+    // --- PLAYBACK SPEED ---
+    function cyclePlaybackSpeed() {
+      const idx = SPEED_STEPS.indexOf(playbackSpeed);
+      playbackSpeed = SPEED_STEPS[(idx + 1) % SPEED_STEPS.length];
+      localStorage.setItem('sonata_speed', playbackSpeed);
+      if (ytPlayer && ytPlayer.setPlaybackRate) ytPlayer.setPlaybackRate(playbackSpeed);
+      updateSpeedButtonLabel();
+      triggerSystemToast(`Speed: ${playbackSpeed}x`);
+    }
+
+    function updateSpeedButtonLabel() {
+      const btn = document.getElementById('np-btn-speed');
+      if (btn) {
+        btn.innerText = playbackSpeed + 'x';
+        btn.classList.toggle('toggle-active', playbackSpeed !== 1);
+      }
+    }
+
+    // --- VOLUME ---
+    function setPlayerVolume(vol) {
+      currentVolume = Math.max(0, Math.min(100, vol));
+      localStorage.setItem('sonata_volume', currentVolume);
+      if (ytPlayer && ytPlayer.setVolume) ytPlayer.setVolume(currentVolume);
+      updateVolumeUI();
+    }
+
+    function updateVolumeUI() {
+      const slider = document.getElementById('np-volume-slider');
+      const label = document.getElementById('np-volume-label');
+      if (slider) slider.value = currentVolume;
+      if (label) label.innerText = currentVolume;
+
+      const isMuted = currentVolume === 0;
+      const mutedIconPath = `<line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line>`;
+      const loudIconPath = `<path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>`;
+
+      const topIcon = document.getElementById('np-volume-icon');
+      if (topIcon) {
+        topIcon.querySelectorAll('path, line').forEach(el => el.remove());
+        topIcon.insertAdjacentHTML('beforeend', isMuted ? mutedIconPath : loudIconPath);
+      }
+      const muteIcon = document.getElementById('np-mute-icon');
+      if (muteIcon) {
+        muteIcon.querySelectorAll('path, line').forEach(el => el.remove());
+        muteIcon.insertAdjacentHTML('beforeend', isMuted ? mutedIconPath : `<path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>`);
+      }
+
+      const volBtn = document.getElementById('np-btn-volume');
+      if (volBtn) volBtn.classList.toggle('toggle-active', isMuted);
+    }
+
+    function toggleMute() {
+      if (currentVolume > 0) {
+        lastVolumeBeforeMute = currentVolume;
+        setPlayerVolume(0);
+      } else {
+        setPlayerVolume(lastVolumeBeforeMute || 70);
+      }
+    }
+
+    function toggleVolumePanel() {
+      document.getElementById('np-volume-panel').classList.toggle('hidden');
+    }
+
+    // --- SLEEP TIMER ---
+    function openSleepTimerModal() {
+      updateSleepTimerModalUI();
+      document.getElementById('modal-sleep-timer').classList.remove('hidden');
+    }
+
+    function closeSleepTimerModal() {
+      document.getElementById('modal-sleep-timer').classList.add('hidden');
+    }
+
+    function selectSleepTimerOption(rawValue) {
+      clearSleepTimer(false);
+      if (rawValue === 'end') {
+        sleepTimerMode = 'end';
+        triggerSystemToast("Sleep timer: stopping at end of this track");
+      } else {
+        const minutes = parseInt(rawValue, 10);
+        sleepTimerMode = minutes;
+        sleepTimerHandle = setTimeout(fireSleepTimer, minutes * 60000);
+        triggerSystemToast(`Sleep timer set: ${minutes} min`);
+      }
+      updateSleepTimerBadge();
+      updateSleepTimerModalUI();
+      closeSleepTimerModal();
+    }
+
+    function clearSleepTimer(showToast) {
+      if (sleepTimerHandle) {
+        clearTimeout(sleepTimerHandle);
+        sleepTimerHandle = null;
+      }
+      sleepTimerMode = null;
+      updateSleepTimerBadge();
+      updateSleepTimerModalUI();
+      if (showToast) triggerSystemToast("Sleep timer off");
+    }
+
+    function fireSleepTimer() {
+      if (ytPlayer && ytPlayer.pauseVideo) ytPlayer.pauseVideo();
+      clearSleepTimer(false);
+      const wave = document.getElementById('dock-wave');
+      const playBtn = document.getElementById('dock-btn-play');
+      if (wave) wave.classList.remove('playing');
+      if (playBtn) playBtn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>`;
+      updateMediaSessionPlaybackState('paused');
+      syncNowPlayingPlayButton();
+      triggerSystemToast("Sleep timer ended — playback paused");
+    }
+
+    function updateSleepTimerBadge() {
+      const btn = document.getElementById('np-btn-sleep');
+      if (btn) btn.classList.toggle('toggle-active', !!sleepTimerMode);
+    }
+
+    function updateSleepTimerModalUI() {
+      const status = document.getElementById('sleep-timer-status');
+      if (status) {
+        if (sleepTimerMode === 'end') status.innerText = "Music will stop after the current track finishes.";
+        else if (sleepTimerMode) status.innerText = `Music will pause in about ${sleepTimerMode} minutes.`;
+        else status.innerText = "Music will pause automatically once the timer runs out.";
+      }
+      document.querySelectorAll('.sleep-timer-option').forEach(btn => {
+        const val = btn.getAttribute('data-minutes');
+        const isSelected = (sleepTimerMode === 'end' && val === 'end') || (sleepTimerMode === parseInt(val, 10));
+        btn.classList.toggle('selected', isSelected);
+      });
+    }
+
+    // --- UP NEXT / QUEUE VIEW ---
+    function openQueueViewModal() {
+      renderQueueViewModal();
+      document.getElementById('modal-queue-view').classList.remove('hidden');
+    }
+
+    function closeQueueViewModal() {
+      document.getElementById('modal-queue-view').classList.add('hidden');
+    }
+
+    function renderQueueViewModal() {
+      const container = document.getElementById('queue-view-list');
+      const subtitle = document.getElementById('queue-view-subtitle');
+      container.innerHTML = "";
+
+      if (activeQueue.length === 0) {
+        subtitle.innerText = "Nothing queued yet";
+        container.innerHTML = `<div style="color:var(--text-muted); text-align:center; font-size:13px; padding:25px;">Play a track or hit Play All to build your queue.</div>`;
+        return;
+      }
+
+      subtitle.innerText = `${activeQueue.length} track${activeQueue.length === 1 ? '' : 's'} in queue${isShuffleOn ? ' · Shuffled' : ''}${repeatMode !== 'off' ? ' · Repeat ' + (repeatMode === 'one' ? '1' : 'All') : ''}`;
+
+      const nextIdx = computeAdjacentIndex(1, true);
+
+      activeQueue.forEach((track, idx) => {
+        const isCurrent = idx === activeQueuePointer;
+        const isUpNext = !isCurrent && idx === nextIdx;
+        const row = document.createElement('div');
+        row.className = 'album-item-row' + (isCurrent ? ' queue-current-row' : '');
+        row.onclick = () => {
+          activeQueuePointer = idx;
+          executeAudioStreamPipeline(activeQueue[idx]);
+          closeQueueViewModal();
+        };
+        const thumb = `https://img.youtube.com/vi/${track.id}/default.jpg`;
+        row.innerHTML = `
+          <img src="${thumb}" class="album-item-thumb" alt="Cover">
+          <div class="album-item-info">
+            <div class="album-item-title">${track.title}</div>
+            <div class="album-item-author">${isCurrent ? 'Now Playing' : `#${idx + 1} in queue`}</div>
+          </div>
+          ${isCurrent ? '<div class="queue-badge-playing">Playing</div>' : (isUpNext ? '<div class="queue-badge-next">Next</div>' : '')}
+        `;
+        container.appendChild(row);
+      });
+    }
+
+    // --- LIBRARY SEARCH ---
+    function toggleLibrarySearchPanel() {
+      const row = document.getElementById('library-search-row');
+      const isHidden = row.classList.toggle('hidden');
+      if (!isHidden) {
+        requestAnimationFrame(() => document.getElementById('library-search-input').focus());
+      } else {
+        document.getElementById('library-search-input').value = '';
+        librarySearchQuery = '';
+        renderTracksDashboard();
+      }
     }
 
     function executeAudioStreamPipeline(track) {
       if(!track) return;
       clearInterval(timelineUpdateInterval);
+      recordRecentlyPlayed(track.id);
 
       document.getElementById('dock-title-text').innerText = track.title;
       document.getElementById('dock-wave').classList.add('playing');
@@ -2317,6 +3663,7 @@
       if(!ytApiReady) { triggerSystemToast("Awaiting Streaming Core..."); return; }
       if(ytPlayer) {
         ytPlayer.loadVideoById(videoId);
+        if (ytPlayer.setVolume) ytPlayer.setVolume(currentVolume);
       } else {
         ytPlayer = new YT.Player('iframe-target', {
           height: '100%',
@@ -2324,7 +3671,10 @@
           videoId: videoId,
           playerVars: { 'autoplay': 1, 'controls': 0, 'disablekb': 1, 'fs': 0, 'modestbranding': 1, 'rel':0 },
           events: {
-            'onReady': (e) => e.target.playVideo(),
+            'onReady': (e) => {
+              e.target.setVolume(currentVolume);
+              e.target.playVideo();
+            },
             'onStateChange': handleYoutubeStateTransitions
           }
         });
@@ -2334,6 +3684,9 @@
 
     function handleYoutubeStateTransitions(event) {
       if(event.data === YT.PlayerState.PLAYING) {
+        if (ytPlayer.setPlaybackRate && ytPlayer.getPlaybackRate && ytPlayer.getPlaybackRate() !== playbackSpeed) {
+          ytPlayer.setPlaybackRate(playbackSpeed);
+        }
         const realTitle = ytPlayer.getVideoData().title;
         if(realTitle && activeQueue[activeQueuePointer].title.includes("Fetching")) {
           activeQueue[activeQueuePointer].title = realTitle;
@@ -2364,7 +3717,28 @@
         updateMediaSessionPlaybackState(isPlaying ? 'playing' : 'paused');
       }
 
-      if(event.data === YT.PlayerState.ENDED) executeNextTrackTrackWrap();
+      if(event.data === YT.PlayerState.ENDED) handleTrackFinishedPlaying();
+    }
+
+    function handleTrackFinishedPlaying() {
+      if (sleepTimerMode === 'end') {
+        clearSleepTimer(false);
+        stopPlaybackAtQueueEnd();
+        triggerSystemToast("Sleep timer ended — playback paused");
+        return;
+      }
+      if (repeatMode === 'one' && ytPlayer) {
+        ytPlayer.seekTo(0, true);
+        ytPlayer.playVideo();
+        return;
+      }
+      const nextIdx = computeAdjacentIndex(1, /* wrapAlways */ false);
+      if (nextIdx === -1) {
+        stopPlaybackAtQueueEnd();
+        return;
+      }
+      activeQueuePointer = nextIdx;
+      executeAudioStreamPipeline(activeQueue[activeQueuePointer]);
     }
 
     function initTrackTimelineTicker() {
@@ -2387,6 +3761,19 @@
         if(fillStrip) fillStrip.style.width = `${percentage}%`;
 
         if(textDock) textDock.innerText = formatTimeStrings(currentTime) + " / " + formatTimeStrings(duration);
+
+        // Per-track strip: shows remaining time on the currently playing card
+        // (was never wired up before, so it silently stayed at "0:00").
+        const stripDurationNode = document.getElementById('strip-duration-node');
+        if(stripDurationNode) {
+          const hasValidDuration = ytPlayer && ytPlayer.getDuration && ytPlayer.getDuration() > 1;
+          if(hasValidDuration) {
+            const remaining = Math.max(duration - currentTime, 0);
+            stripDurationNode.innerText = "-" + formatTimeStrings(remaining);
+          } else {
+            stripDurationNode.innerText = "0:00";
+          }
+        }
 
         const fillNowPlaying = document.getElementById('np-progress-fill');
         if(fillNowPlaying) fillNowPlaying.style.width = `${percentage}%`;
@@ -2444,13 +3831,17 @@
 
     function executeNextTrackTrackWrap() {
       if(activeQueue.length <= 1) return;
-      activeQueuePointer = (activeQueuePointer + 1) % activeQueue.length;
+      const nextIdx = computeAdjacentIndex(1, /* wrapAlways */ true);
+      if (nextIdx === -1) return;
+      activeQueuePointer = nextIdx;
       executeAudioStreamPipeline(activeQueue[activeQueuePointer]);
     }
 
     function executePrevTrackTrackWrap() {
       if(activeQueue.length <= 1) return;
-      activeQueuePointer = (activeQueuePointer - 1 + activeQueue.length) % activeQueue.length;
+      const prevIdx = computeAdjacentIndex(-1, /* wrapAlways */ true);
+      if (prevIdx === -1) return;
+      activeQueuePointer = prevIdx;
       executeAudioStreamPipeline(activeQueue[activeQueuePointer]);
     }
 
@@ -2466,9 +3857,13 @@
     }
 
     function executeExternalDownloadConverter(trackId) {
-      navigator.clipboard.writeText(`https://www.youtube.com/watch?v=${trackId}`);
-      triggerSystemToast("URL copied. Opening converter...");
-      setTimeout(() => { window.open(`https://convertytmp3.org/`, '_blank'); }, 1500);
+      const videoUrl = `https://www.youtube.com/watch?v=${trackId}`;
+      navigator.clipboard.writeText(videoUrl).catch(() => {});
+      // Opened synchronously (no setTimeout) so it stays inside the same
+      // user-gesture as the tap — delaying this made mobile browsers treat
+      // it as an unsolicited popup and silently block it.
+      window.open('https://convertytmp3.org/', '_blank');
+      triggerSystemToast("Link copied. Converter opened.");
     }
 
     // 10X: replaces window.confirm() with the unified glassmorphism delete modal
@@ -2518,6 +3913,9 @@
       localStorage.setItem('sonata_library', JSON.stringify(trackLibrary));
       syncToCloud(() => window.SonataCloud.deleteTrack(trackId));
 
+      recentlyPlayed = recentlyPlayed.filter(id => id !== trackId);
+      localStorage.setItem('sonata_recent', JSON.stringify(recentlyPlayed));
+
       // Cascade deletions safely through normalized playlists
       const affectedPlaylists = playlistLibrary.filter(p => p.tracks.includes(trackId));
       playlistLibrary.forEach(p => {
@@ -2547,17 +3945,11 @@
 
         activeQueue = [];
         activeQueuePointer = -1;
+        shuffleOrder = [];
       } else if (currentlyPlayingTrack) {
-        if (currentTabIndex === 'favorites') {
-          activeQueue = trackLibrary.filter(t => t.favorite);
-        } else if (currentTabIndex.startsWith('playlist-')) {
-          const pId = currentTabIndex.replace('playlist-', '');
-          const targetP = playlistLibrary.find(p => p.id === pId);
-          activeQueue = targetP ? trackLibrary.filter(t => targetP.tracks.includes(t.id)) : [...trackLibrary];
-        } else {
-          activeQueue = [...trackLibrary];
-        }
+        activeQueue = getFilteredTrackSubset();
         activeQueuePointer = activeQueue.findIndex(t => t.id === currentlyPlayingTrack.id);
+        if (isShuffleOn) rebuildShuffleOrder();
       }
 
       renderAppMetrics();
@@ -2599,6 +3991,102 @@
       host.innerText = msg;
       document.body.appendChild(host);
       setTimeout(() => host.remove(), 2500);
+    }
+
+    // --- BACKUP & RESTORE ---
+    function exportLibraryBackupFile() {
+      const backup = {
+        app: 'Sonata Elite',
+        version: 1,
+        exportedAt: new Date().toISOString(),
+        tracks: trackLibrary,
+        playlists: playlistLibrary,
+        settings: {
+          theme: localStorage.getItem('sonata_theme') || 'deep',
+          shuffle: isShuffleOn,
+          repeat: repeatMode,
+          volume: currentVolume,
+          speed: playbackSpeed
+        }
+      };
+      const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const stamp = new Date().toISOString().slice(0, 10);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `sonata-backup-${stamp}.json`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+      triggerSystemToast("Backup downloaded");
+    }
+
+    function triggerImportFilePicker() {
+      document.getElementById('import-file-input').click();
+    }
+
+    function handleImportFileSelected(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        try {
+          const data = JSON.parse(ev.target.result);
+          if (!data || !Array.isArray(data.tracks)) throw new Error("Missing tracks array");
+          pendingImportData = data;
+          const trackCount = data.tracks.length;
+          const playlistCount = Array.isArray(data.playlists) ? data.playlists.length : 0;
+          document.getElementById('import-summary-text').innerText =
+            `${trackCount} track${trackCount === 1 ? '' : 's'}, ${playlistCount} playlist${playlistCount === 1 ? '' : 's'}`;
+          document.getElementById('modal-import-confirm').classList.remove('hidden');
+        } catch (err) {
+          triggerSystemToast("Couldn't read that file — is it a Sonata backup?");
+        }
+      };
+      reader.readAsText(file);
+      e.target.value = ''; // allow re-selecting the same file later
+    }
+
+    function closeImportConfirmModal() {
+      pendingImportData = null;
+      document.getElementById('modal-import-confirm').classList.add('hidden');
+    }
+
+    function confirmImportLibrary() {
+      if (!pendingImportData) return;
+
+      trackLibrary = Array.isArray(pendingImportData.tracks) ? pendingImportData.tracks : [];
+      playlistLibrary = Array.isArray(pendingImportData.playlists) ? pendingImportData.playlists : [];
+      localStorage.setItem('sonata_library', JSON.stringify(trackLibrary));
+      localStorage.setItem('sonata_playlists', JSON.stringify(playlistLibrary));
+
+      // Clear anything that could silently filter out the freshly-imported
+      // tracks and make it look like nothing happened: a leftover search
+      // term, or being parked on Recent/a playlist tab that no longer
+      // matches the new library.
+      recentlyPlayed = [];
+      localStorage.setItem('sonata_recent', JSON.stringify(recentlyPlayed));
+      librarySearchQuery = '';
+      const searchInput = document.getElementById('library-search-input');
+      if (searchInput) searchInput.value = '';
+      document.getElementById('library-search-row').classList.add('hidden');
+
+      trackLibrary.forEach(t => syncToCloud(() => window.SonataCloud.saveTrack(t)));
+      playlistLibrary.forEach(p => syncToCloud(() => window.SonataCloud.savePlaylist(p)));
+
+      if (pendingImportData.settings) {
+        if (pendingImportData.settings.theme) applyTheme(pendingImportData.settings.theme);
+        if (typeof pendingImportData.settings.volume === 'number') setPlayerVolume(pendingImportData.settings.volume);
+      }
+
+      pendingImportData = null;
+      document.getElementById('modal-import-confirm').classList.add('hidden');
+      document.getElementById('modal-settings').classList.add('hidden');
+      renderAppMetrics();
+      switchTab('all');
+      triggerSystemToast("Library restored from backup");
     }
   </script>
 
