@@ -1378,7 +1378,7 @@
       height: 48px;
       font-size: 14px;
       font-weight: 700;
-      border-radius: 999px;
+      border-radius: 18px;
       cursor: pointer;
       box-shadow: 0 8px 24px rgba(255, 75, 43, 0.3);
       transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
@@ -1397,7 +1397,7 @@
       height: 48px;
       font-size: 14px;
       font-weight: 700;
-      border-radius: 999px;
+      border-radius: 18px;
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -1717,11 +1717,16 @@
       background: var(--accent-gradient);
       color: #ffffff;
       border: none;
-      border-radius: 999px;
+      border-radius: 18px;
+      height: 48px;
       padding: 0 18px;
       font-size: 14px;
       font-weight: 700;
       cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
       box-shadow: 0 4px 15px rgba(var(--accent-rgb), 0.3);
     }
 
@@ -2203,7 +2208,7 @@
       </div>
       <p class="owner-credit-text">This web app was designed and modified exclusively for its owner:</p>
       <h2 class="owner-credit-name">Reymark Delagao</h2>
-      <div class="delete-cancel-lnk" id="btn-close-owner-credit" style="width:100%;">Close</div>
+      <div class="delete-cancel-lnk" id="btn-close-owner-credit" style="width:100%; flex:none;">Close</div>
     </div>
   </div>
 
