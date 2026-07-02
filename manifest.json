@@ -1,7 +1,7 @@
 {
   "name": "Sonata — Premium Music Player",
   "short_name": "Sonata",
-  "description": "An offline-capable, YouTube-powered premium music player with playlists, favorites, and a glassmorphism control suite.",
+  "description": "YouTube-powered premium music player with playlists, favorites, and a glassmorphism control suite.",
   "start_url": "./index.html",
   "scope": "./",
   "id": "/index.html",

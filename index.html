@@ -1850,6 +1850,735 @@
     @media (min-width: 1440px) {
       .app-container { max-width: 1280px; }
     }
+
+    /* ================================================================
+       LIQUID GLASS ELITE — premium finishing layer
+       Appended last on purpose: equal-specificity rules here win by
+       source order, so every override below lands without touching
+       (or risking) the original rules above. Three jobs:
+         1. Native-app shell behavior (no rubber-band, no scrollbars,
+            notch-aware, nothing selectable or draggable).
+         2. Ambient depth — a slow accent-tinted aurora living behind
+            the glass, so every backdrop-filter has something rich to
+            refract. Glass only looks expensive over expensive light.
+         3. True liquid-glass optics on interactive elements: convex
+            top gloss, refraction rim, deeper saturation, soft drop.
+       ================================================================ */
+
+    /* --- 1. NATIVE APP SHELL --- */
+    html {
+      height: 100%;
+      overscroll-behavior: none;   /* kills pull-to-refresh + rubber band */
+    }
+
+    body {
+      min-height: 100dvh;          /* true dynamic viewport, no URL-bar jump */
+      overscroll-behavior: none;
+      cursor: default;
+      text-rendering: optimizeLegibility;
+    }
+
+    /* Scrollbars never appear in a native app */
+    * { scrollbar-width: none; }
+    *::-webkit-scrollbar { width: 0; height: 0; display: none; }
+
+    img {
+      -webkit-user-drag: none;
+      user-select: none;
+    }
+
+    input, textarea {
+      user-select: text;
+      -webkit-user-select: text;
+    }
+
+    /* Notch / Dynamic Island awareness */
+    .app-container {
+      padding-top: max(24px, calc(14px + env(safe-area-inset-top, 0px)));
+    }
+
+    /* Keyboard users still get focus (outlines were reset globally) */
+    button:focus-visible,
+    .tab-item:focus-visible,
+    .nav-card:focus-visible {
+      box-shadow: 0 0 0 2px rgba(var(--accent-rgb), 0.55);
+    }
+
+    /* --- 2. AMBIENT AURORA DEPTH --- */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: -20%;
+      z-index: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(38% 30% at 18% 12%, rgba(var(--accent-rgb), 0.16) 0%, transparent 70%),
+        radial-gradient(32% 26% at 84% 30%, rgba(var(--accent-rgb), 0.10) 0%, transparent 70%),
+        radial-gradient(46% 34% at 55% 96%, rgba(var(--accent-rgb), 0.08) 0%, transparent 70%);
+      animation: auroraDrift 26s ease-in-out infinite alternate;
+    }
+
+    @keyframes auroraDrift {
+      0%   { transform: translate3d(-2.5%, -1.5%, 0) scale(1); }
+      100% { transform: translate3d(2.5%, 2%, 0) scale(1.06); }
+    }
+
+    [data-theme="light"] body::after {
+      background:
+        radial-gradient(38% 30% at 18% 12%, rgba(var(--accent-rgb), 0.07) 0%, transparent 70%),
+        radial-gradient(32% 26% at 84% 30%, rgba(var(--accent-rgb), 0.05) 0%, transparent 70%);
+    }
+
+    [data-theme="oled"] body::after {
+      background:
+        radial-gradient(38% 30% at 18% 12%, rgba(var(--accent-rgb), 0.09) 0%, transparent 70%),
+        radial-gradient(46% 34% at 55% 96%, rgba(var(--accent-rgb), 0.05) 0%, transparent 70%);
+    }
+
+    /* Soft vignette pulls the eye inward like a device bezel */
+    .app-container::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background: radial-gradient(120% 90% at 50% 40%, transparent 60%, rgba(0, 0, 0, 0.30) 100%);
+    }
+    [data-theme="light"] .app-container::before { display: none; }
+
+    /* --- 3. LIQUID GLASS OPTICS --- */
+
+    /* Icon buttons: convex glass lens. A curved top gloss (::before)
+       plus a hairline refraction rim, over heavier blur + saturation. */
+    .icon-btn {
+      position: relative;
+      overflow: hidden;
+      backdrop-filter: blur(28px) saturate(190%);
+      -webkit-backdrop-filter: blur(28px) saturate(190%);
+      box-shadow:
+        0 8px 20px rgba(0, 0, 0, 0.38),
+        0 1px 2px rgba(0, 0, 0, 0.25),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+        inset 0 1.5px 1px rgba(255, 255, 255, 0.16),
+        inset 0 -2px 3px rgba(0, 0, 0, 0.22);
+    }
+
+    .icon-btn::before {
+      content: '';
+      position: absolute;
+      inset: 1px;
+      border-radius: inherit;
+      background: linear-gradient(180deg,
+        rgba(255, 255, 255, 0.22) 0%,
+        rgba(255, 255, 255, 0.05) 42%,
+        transparent 55%,
+        rgba(255, 255, 255, 0.04) 100%);
+      pointer-events: none;
+    }
+
+    .icon-btn > svg {
+      position: relative;
+      z-index: 1;
+      filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.25));
+    }
+
+    .icon-btn:hover {
+      box-shadow:
+        0 12px 26px rgba(0, 0, 0, 0.42),
+        0 0 18px rgba(var(--accent-rgb), 0.18),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+        inset 0 1.5px 1px rgba(255, 255, 255, 0.22),
+        inset 0 -2px 3px rgba(0, 0, 0, 0.22);
+    }
+
+    .icon-btn:active {
+      transform: scale(0.92);
+      transition: transform 0.1s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    [data-theme="light"] .icon-btn {
+      box-shadow:
+        0 8px 20px rgba(15, 23, 42, 0.12),
+        0 1px 2px rgba(15, 23, 42, 0.08),
+        inset 0 1.5px 1px rgba(255, 255, 255, 0.9),
+        inset 0 -2px 3px rgba(15, 23, 42, 0.05);
+    }
+    [data-theme="light"] .icon-btn::before {
+      background: linear-gradient(180deg,
+        rgba(255, 255, 255, 0.8) 0%,
+        rgba(255, 255, 255, 0.2) 42%,
+        transparent 55%);
+    }
+    [data-theme="light"] .icon-btn > svg { filter: none; }
+
+    /* Small circular strip controls: same lens, scaled down */
+    .strip-control-btn {
+      backdrop-filter: blur(16px) saturate(170%);
+      -webkit-backdrop-filter: blur(16px) saturate(170%);
+      box-shadow:
+        0 3px 8px rgba(0, 0, 0, 0.18),
+        inset 0 1px 0 rgba(255, 255, 255, 0.12),
+        inset 0 -1.5px 2px rgba(0, 0, 0, 0.14);
+    }
+    [data-theme="light"] .strip-control-btn {
+      box-shadow:
+        0 3px 8px rgba(15, 23, 42, 0.07),
+        inset 0 1px 0 rgba(255, 255, 255, 0.7),
+        inset 0 -1.5px 2px rgba(15, 23, 42, 0.04);
+    }
+
+    /* Filled accent controls become wet candy glass: strong top gloss,
+       inner bevel, colored under-glow sitting on the surface below. */
+    .play-all-btn,
+    .playlist-create-btn,
+    .tab-item.active,
+    .nav-card .count-tag {
+      position: relative;
+      overflow: hidden;
+      box-shadow:
+        0 10px 24px rgba(var(--accent-rgb), 0.38),
+        0 2px 6px rgba(0, 0, 0, 0.25),
+        inset 0 1.5px 0 rgba(255, 255, 255, 0.40),
+        inset 0 -2.5px 4px rgba(0, 0, 0, 0.28);
+    }
+
+    .play-all-btn::after,
+    .playlist-create-btn::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: linear-gradient(180deg,
+        rgba(255, 255, 255, 0.30) 0%,
+        rgba(255, 255, 255, 0.06) 48%,
+        transparent 60%);
+      pointer-events: none;
+    }
+
+    .play-all-btn > *,
+    .playlist-create-btn > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .play-all-btn:active,
+    .playlist-create-btn:active {
+      transform: scale(0.95);
+      box-shadow:
+        0 4px 12px rgba(var(--accent-rgb), 0.30),
+        inset 0 1px 0 rgba(255, 255, 255, 0.25),
+        inset 0 2px 6px rgba(0, 0, 0, 0.25);
+      transition: all 0.1s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* Dock play ring: deepest lens in the app */
+    .dock-play-ring {
+      box-shadow:
+        0 10px 26px rgba(var(--accent-rgb), 0.50),
+        0 2px 6px rgba(0, 0, 0, 0.30),
+        inset 0 2px 1px rgba(255, 255, 255, 0.45),
+        inset 0 -3px 5px rgba(0, 0, 0, 0.30);
+    }
+
+    /* Track cards: floating panes with a lit top hairline */
+    .track-strip {
+      box-shadow:
+        0 10px 26px rgba(0, 0, 0, 0.24),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    }
+
+    .track-strip.active-strip {
+      box-shadow:
+        0 14px 34px rgba(var(--accent-rgb), 0.16),
+        0 0 0 1px rgba(var(--accent-rgb), 0.20),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    }
+
+    [data-theme="light"] .track-strip {
+      box-shadow:
+        0 10px 26px rgba(15, 23, 42, 0.07),
+        inset 0 1px 0 rgba(255, 255, 255, 0.85);
+    }
+
+    .track-banner {
+      box-shadow:
+        0 8px 18px rgba(0, 0, 0, 0.35),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.07);
+    }
+
+    .track-main:active .track-banner img {
+      transform: scale(1.07);
+    }
+
+    /* Hero cards: give the glass a resting elevation */
+    .nav-card {
+      box-shadow:
+        0 14px 32px rgba(0, 0, 0, 0.28),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    }
+    [data-theme="light"] .nav-card {
+      box-shadow:
+        0 14px 32px rgba(15, 23, 42, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    }
+
+    /* Bottom dock: heaviest glass in the app — deep blur, accent
+       under-glow bleeding onto the page, crisp lit top edge. */
+    .bottom-dock {
+      backdrop-filter: blur(52px) saturate(200%);
+      -webkit-backdrop-filter: blur(52px) saturate(200%);
+      box-shadow:
+        0 26px 60px rgba(0, 0, 0, 0.60),
+        0 10px 44px rgba(var(--accent-rgb), 0.13),
+        inset 0 1.5px 0 rgba(255, 255, 255, 0.14),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+    }
+
+    [data-theme="light"] .bottom-dock {
+      box-shadow:
+        0 26px 60px rgba(15, 23, 42, 0.18),
+        0 10px 44px rgba(var(--accent-rgb), 0.10),
+        inset 0 1.5px 0 rgba(255, 255, 255, 0.9);
+    }
+
+    /* Search glass card + inputs: frosted pane, lit edge, accent focus */
+    .search-expand-card {
+      backdrop-filter: blur(44px) saturate(190%);
+      -webkit-backdrop-filter: blur(44px) saturate(190%);
+      box-shadow:
+        0 24px 56px rgba(0, 0, 0, 0.40),
+        inset 0 1.5px 0 rgba(255, 255, 255, 0.10);
+    }
+
+    .search-expand-input-row input,
+    .playlist-input-wrapper input {
+      box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.20);
+      transition: border-color 0.25s ease, box-shadow 0.25s ease;
+    }
+    [data-theme="light"] .search-expand-input-row input,
+    [data-theme="light"] .playlist-input-wrapper input {
+      box-shadow: inset 0 2px 5px rgba(15, 23, 42, 0.05);
+    }
+    .search-expand-input-row input:focus,
+    .playlist-input-wrapper input:focus {
+      box-shadow:
+        inset 0 2px 5px rgba(0, 0, 0, 0.15),
+        0 0 0 3px rgba(var(--accent-rgb), 0.18),
+        0 0 24px rgba(var(--accent-rgb), 0.15);
+    }
+
+    /* Progress fill: glass tube with a lit core */
+    .track-progress-fill {
+      box-shadow:
+        0 0 12px rgba(var(--accent-rgb), 0.65),
+        inset 0 1px 0 rgba(255, 255, 255, 0.45);
+    }
+
+    /* Sleep timer: custom minutes input + liquid-glass auto-close switch */
+    .sleep-custom-row {
+      display: flex;
+      gap: 8px;
+      width: 100%;
+    }
+
+    .sleep-custom-row input {
+      flex-grow: 1;
+      min-width: 0;
+      background: var(--input-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      height: 46px;
+      padding: 0 14px;
+      color: var(--text-main);
+      font-size: 14px;
+      font-weight: 600;
+      outline: none;
+      box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.18);
+      transition: border-color 0.25s ease, box-shadow 0.25s ease;
+      -moz-appearance: textfield;
+      appearance: textfield;
+    }
+    .sleep-custom-row input::-webkit-outer-spin-button,
+    .sleep-custom-row input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    .sleep-custom-row input:focus {
+      border-color: var(--accent-color);
+      box-shadow:
+        inset 0 2px 5px rgba(0, 0, 0, 0.14),
+        0 0 0 3px rgba(var(--accent-rgb), 0.18);
+    }
+    [data-theme="light"] .sleep-custom-row input {
+      box-shadow: inset 0 2px 5px rgba(15, 23, 42, 0.05);
+    }
+
+    .sleep-custom-set-btn {
+      flex-shrink: 0;
+      background: var(--accent-gradient);
+      color: #ffffff;
+      border-radius: 14px;
+      height: 46px;
+      padding: 0 20px;
+      font-size: 13.5px;
+      font-weight: 700;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      box-shadow:
+        0 8px 20px rgba(var(--accent-rgb), 0.35),
+        inset 0 1.5px 0 rgba(255, 255, 255, 0.38),
+        inset 0 -2.5px 4px rgba(0, 0, 0, 0.25);
+      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
+    }
+    .sleep-custom-set-btn::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.28) 0%, transparent 55%);
+      pointer-events: none;
+    }
+    .sleep-custom-set-btn:active {
+      transform: scale(0.94);
+    }
+
+    .sleep-autoclose-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      width: 100%;
+      background: var(--glass-surface);
+      border: 1px solid var(--glass-border);
+      border-radius: 16px;
+      padding: 12px 14px;
+      cursor: pointer;
+      transition: border-color 0.25s ease, background 0.25s ease;
+    }
+    .sleep-autoclose-row:hover {
+      border-color: rgba(var(--accent-rgb), 0.30);
+    }
+    .sleep-autoclose-row.on {
+      background: rgba(var(--accent-rgb), 0.08);
+      border-color: rgba(var(--accent-rgb), 0.30);
+    }
+
+    .sleep-autoclose-label {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      text-align: left;
+      min-width: 0;
+    }
+    .sleep-autoclose-label span {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--text-main);
+      letter-spacing: -0.1px;
+    }
+    .sleep-autoclose-label small {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    /* iOS-style liquid glass switch */
+    .lux-switch {
+      flex-shrink: 0;
+      width: 48px;
+      height: 28px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--glass-border);
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.25);
+      position: relative;
+      transition: background 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+    }
+    [data-theme="light"] .lux-switch {
+      background: rgba(15, 23, 42, 0.10);
+      box-shadow: inset 0 2px 4px rgba(15, 23, 42, 0.10);
+    }
+
+    .lux-switch-knob {
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: linear-gradient(180deg, #ffffff 0%, #dbe2ee 100%);
+      box-shadow:
+        0 2px 6px rgba(0, 0, 0, 0.35),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9),
+        inset 0 -2px 3px rgba(0, 0, 0, 0.12);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .sleep-autoclose-row.on .lux-switch {
+      background: var(--accent-gradient);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.30),
+        inset 0 -2px 4px rgba(0, 0, 0, 0.20),
+        0 0 14px rgba(var(--accent-rgb), 0.35);
+    }
+    .sleep-autoclose-row.on .lux-switch-knob {
+      transform: translateX(20px);
+    }
+
+    /* Hero area: with Albums removed, Playlists becomes a single confident
+       full-width banner instead of a lonely half-width square. Wider sheen
+       travel and a bigger label sell it as the app's front door. */
+    .hero-cards {
+      grid-template-columns: 1fr;
+    }
+
+    .nav-card {
+      aspect-ratio: unset;
+      height: 112px;
+    }
+
+    .nav-card span:not(.count-tag) {
+      font-size: 23px;
+      letter-spacing: -0.7px;
+    }
+
+    @media (min-width: 1024px) {
+      .hero-cards { grid-template-columns: minmax(0, 520px); }
+      .nav-card { height: 132px; }
+    }
+
+    /* ---- PLAYLISTS VAULT: full-screen premium takeover ----
+       Scoped to #modal-playlists-dashboard only, so the shared
+       .playlist-modal-content used by the track "manage playlists"
+       modal keeps its original centered-card behavior. */
+    #modal-playlists-dashboard {
+      padding: 0;
+      align-items: stretch;
+      backdrop-filter: blur(30px) saturate(180%);
+      -webkit-backdrop-filter: blur(30px) saturate(180%);
+    }
+
+    #modal-playlists-dashboard .vault-shell {
+      max-width: none;
+      width: 100%;
+      height: 100dvh;
+      border-radius: 0;
+      border: none;
+      padding: calc(18px + env(safe-area-inset-top, 0px)) 22px calc(18px + var(--safe-bottom));
+      gap: 22px;
+      background:
+        radial-gradient(90% 36% at 50% 0%, rgba(var(--accent-rgb), 0.14) 0%, transparent 65%),
+        var(--modal-surface);
+      box-shadow: none;
+      animation: npSlideUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .vault-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      flex-shrink: 0;
+    }
+
+    .vault-title {
+      font-size: 30px;
+      font-weight: 900;
+      letter-spacing: -1.2px;
+      background: var(--heading-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .vault-subtitle {
+      font-size: 12.5px;
+      color: var(--text-muted);
+      font-weight: 500;
+      margin-top: 3px;
+    }
+
+    /* The list owns all leftover vertical space and scrolls inside itself */
+    .vault-list-wrap {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #modal-playlists-dashboard .playlist-selector-list {
+      max-height: none;
+      flex: 1;
+      gap: 12px;
+      padding: 4px 2px 12px;
+      overscroll-behavior: contain;
+    }
+
+    /* Premium vault card: color-identity art tile + name + count pill */
+    .vault-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--glass-surface);
+      border: 1px solid var(--glass-border);
+      border-radius: 22px;
+      padding: 13px 14px;
+      box-shadow:
+        0 10px 24px rgba(0, 0, 0, 0.22),
+        inset 0 1px 0 rgba(255, 255, 255, 0.06);
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+                  border-color 0.25s ease, background 0.25s ease;
+    }
+    [data-theme="light"] .vault-card {
+      box-shadow:
+        0 10px 24px rgba(15, 23, 42, 0.07),
+        inset 0 1px 0 rgba(255, 255, 255, 0.85);
+    }
+    .vault-card:hover {
+      border-color: rgba(var(--accent-rgb), 0.30);
+      background: rgba(var(--accent-rgb), 0.06);
+    }
+    .vault-card:active {
+      transform: scale(0.975);
+      transition: transform 0.12s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .vault-card-main {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      cursor: pointer;
+    }
+
+    /* Art tile: the accent gradient rotated per playlist, with the same
+       glossy candy treatment as the app's filled buttons. */
+    .vault-art {
+      width: 54px;
+      height: 54px;
+      border-radius: 17px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      background: var(--accent-gradient);
+      filter: hue-rotate(var(--vault-hue, 0deg));
+      box-shadow:
+        0 8px 18px rgba(var(--accent-rgb), 0.35),
+        inset 0 1.5px 0 rgba(255, 255, 255, 0.40),
+        inset 0 -2.5px 4px rgba(0, 0, 0, 0.25);
+      position: relative;
+      overflow: hidden;
+    }
+    .vault-art::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.28) 0%, transparent 55%);
+      pointer-events: none;
+    }
+    .vault-art svg { position: relative; z-index: 1; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3)); }
+
+    .vault-card-info {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      min-width: 0;
+    }
+
+    .vault-card-name {
+      font-size: 16.5px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .vault-card-count {
+      align-self: flex-start;
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+      color: var(--accent-color);
+      background: rgba(var(--accent-rgb), 0.10);
+      border: 1px solid rgba(var(--accent-rgb), 0.22);
+      padding: 2.5px 9px;
+      border-radius: 999px;
+    }
+
+    .vault-card-actions {
+      display: flex;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .vault-card-actions .strip-control-btn {
+      width: 38px;
+      height: 38px;
+    }
+
+    /* Create dock pinned at the bottom as its own glass card */
+    .vault-create-dock {
+      flex-shrink: 0;
+      background: var(--glass-surface);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      padding: 16px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    }
+    [data-theme="light"] .vault-create-dock {
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    }
+
+    .vault-empty {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      padding: 44px 20px;
+      color: var(--text-muted);
+      font-size: 13.5px;
+      font-weight: 500;
+      text-align: center;
+      line-height: 1.6;
+    }
+    .vault-empty-icon {
+      width: 62px;
+      height: 62px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent-color);
+      background: rgba(var(--accent-rgb), 0.08);
+      border: 1px solid rgba(var(--accent-rgb), 0.20);
+      box-shadow: 0 0 30px rgba(var(--accent-rgb), 0.15);
+    }
+
+    /* Desktop: a full-bleed sheet feels wrong on a large screen —
+       return to an elevated tall card, still with the vault styling. */
+    @media (min-width: 640px) {
+      #modal-playlists-dashboard { padding: 28px; align-items: center; }
+      #modal-playlists-dashboard .vault-shell {
+        max-width: 520px;
+        height: auto;
+        max-height: 86vh;
+        border-radius: 34px;
+        border: 1px solid var(--modal-border);
+        padding: 28px;
+        box-shadow: 0 40px 90px rgba(0, 0, 0, 0.6);
+      }
+    }
+
+    /* Respect users who turn animation off — quality floor, silently */
+    @media (prefers-reduced-motion: reduce) {
+      body::after { animation: none; }
+      .dock-play-ring::after { animation: none; opacity: 0.4; }
+      * { transition-duration: 0.01ms !important; }
+    }
   </style>
 </head>
 <body>
@@ -1884,10 +2613,6 @@
     </div>
 
     <div class="hero-cards">
-      <div class="nav-card" id="card-trigger-albums">
-        <span class="count-tag" id="cnt-album">0</span>
-        <span>Albums</span>
-      </div>
       <div class="nav-card" id="card-trigger-playlists">
         <span class="count-tag" id="cnt-playlists">0</span>
         <span>Playlists</span>
@@ -1906,6 +2631,9 @@
         <div class="header-action-group">
           <button class="icon-btn" id="btn-toggle-library-search" style="width:38px; height:38px;" title="Search your library">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          </button>
+          <button class="icon-btn" id="btn-toggle-video" style="width:38px; height:38px;" title="Show / hide video">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="eye-icon-svg"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
           </button>
           <button class="icon-btn" id="btn-open-queue-view" style="width:38px; height:38px;" title="Up Next">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="15" y2="18"></line><circle cx="4" cy="6" r="1.5" fill="currentColor" stroke="none"></circle><circle cx="4" cy="12" r="1.5" fill="currentColor" stroke="none"></circle><circle cx="4" cy="18" r="1.5" fill="currentColor" stroke="none"></circle></svg>
@@ -2024,6 +2752,17 @@
         <button class="sleep-timer-option" data-minutes="60">60 min</button>
         <button class="sleep-timer-option" data-minutes="end">End of track</button>
       </div>
+      <div class="sleep-custom-row">
+        <input type="text" id="sleep-custom-minutes" inputmode="numeric" maxlength="6" placeholder="5 = 5 min · 05 = 5 sec · 1:30">
+        <button class="sleep-custom-set-btn" id="btn-set-custom-sleep">Set</button>
+      </div>
+      <div class="sleep-autoclose-row" id="row-sleep-autoclose" role="switch" aria-checked="false" tabindex="0">
+        <div class="sleep-autoclose-label">
+          <span>Close app when timer ends</span>
+          <small>Sonata pauses, then closes itself</small>
+        </div>
+        <div class="lux-switch" id="switch-sleep-autoclose"><div class="lux-switch-knob"></div></div>
+      </div>
       <div class="delete-modal-actions">
         <div class="delete-cancel-lnk" id="btn-cancel-sleep-timer">Close</div>
         <button class="delete-confirm-btn rename-confirm-btn" id="btn-clear-sleep-timer">Turn Off</button>
@@ -2068,13 +2807,6 @@
           <div class="luxury-theme-pill" data-theme-val="light">Light</div>
           <div class="luxury-theme-pill" data-theme-val="green">Emerald</div>
         </div>
-      </div>
-
-      <div class="setting-row">
-        <span class="setting-label">Visual Display Module</span>
-        <button class="icon-btn" id="btn-toggle-video" style="color: var(--accent-color); width:36px; height:36px;">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="eye-icon-svg"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-        </button>
       </div>
 
       <div class="setting-row-vertical">
@@ -2132,21 +2864,6 @@
     </div>
   </div>
 
-  <div class="albums-modal hidden" id="modal-youtube-albums">
-    <div class="albums-content">
-      <div class="albums-header">
-        <div>
-          <h3 style="font-weight: 800; font-size: 19px; letter-spacing: -0.5px;">YouTube Album</h3>
-          <p style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Select items to append into system</p>
-        </div>
-        <button class="icon-btn" id="btn-close-albums" style="width:36px; height:36px;">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-        </button>
-      </div>
-      <div class="albums-list-container" id="albums-ajax-payload-target"></div>
-    </div>
-  </div>
-
   <div class="settings-modal hidden" id="modal-playlist-orchestrator">
     <div class="playlist-modal-content">
       <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -2175,23 +2892,23 @@
   </div>
 
   <div class="settings-modal hidden" id="modal-playlists-dashboard">
-    <div class="playlist-modal-content">
-      <div style="display: flex; justify-content: space-between; align-items: center;">
-        <div>
-          <h3 style="font-weight: 800; font-size: 20px; letter-spacing: -0.5px;">Playlists Vault</h3>
-          <p style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Select, rename, or delete your spaces</p>
+    <div class="playlist-modal-content vault-shell">
+      <div class="vault-header">
+        <div class="vault-header-text">
+          <h3 class="vault-title">Playlists Vault</h3>
+          <p class="vault-subtitle" id="vault-count-subtitle">Select, rename, or delete your spaces</p>
         </div>
-        <button class="icon-btn" id="btn-close-playlists-dashboard" style="width:36px; height:36px;">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        <button class="icon-btn" id="btn-close-playlists-dashboard" style="width:42px; height:42px;">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
         </button>
       </div>
 
-      <div>
+      <div class="vault-list-wrap">
         <div class="playlist-group-title">Your Playlists</div>
         <div class="playlist-selector-list" id="dashboard-playlists-target-list"></div>
       </div>
 
-      <div style="border-top: 1px solid var(--border-color); padding-top: 16px;">
+      <div class="vault-create-dock">
         <div class="playlist-group-title">Create New Playlist</div>
         <div class="playlist-input-wrapper">
           <input type="text" id="input-dashboard-playlist-name" placeholder="Enter playlist title...">
@@ -2215,7 +2932,6 @@
   <script>
     // System Configurations Injectors
     const YOUTUBE_API_KEY = "AIzaSyA58g8LJy4f_TiLuv-w61c8vEkq0TJnKhw";
-    const TARGET_PLAYLIST_ID = "PLWOkRO8ClsKo";
 
     let trackLibrary = JSON.parse(localStorage.getItem('sonata_library'));
     if(!trackLibrary || trackLibrary.length === 0) {
@@ -2264,6 +2980,10 @@
     // Sleep timer
     let sleepTimerMode = null;   // null | <minutes number> | 'end'
     let sleepTimerHandle = null;
+    let sleepTimerEndsAt = null; // epoch ms when a minute-based timer fires (for the live countdown)
+    // Whether Sonata should try to close itself once the sleep timer fires.
+    // Persisted, since it's a preference rather than a one-off choice.
+    let sleepAutoCloseApp = localStorage.getItem('sonata_sleep_autoclose') === '1';
 
     // Library search (filters whatever tab/playlist is currently open)
     let librarySearchQuery = '';
@@ -2403,6 +3123,12 @@
             ytPlayer.seekTo(Math.min(ytPlayer.getCurrentTime() + (details.seekOffset || 10), ytPlayer.getDuration()), true);
           }
         });
+        // "Stop" from the notification fully ends the session (some OS UIs
+        // expose it as the X / dismiss action on the media notification).
+        navigator.mediaSession.setActionHandler('stop', () => {
+          if (ytPlayer && ytPlayer.stopVideo) ytPlayer.stopVideo();
+          updateMediaSessionPlaybackState('none');
+        });
       } catch (err) {
         console.warn('Some Media Session seek actions are unsupported on this browser:', err);
       }
@@ -2416,7 +3142,8 @@
         album: 'YouTube Stream',
         artwork: [
           { src: `https://img.youtube.com/vi/${track.id}/mqdefault.jpg`, sizes: '320x180', type: 'image/jpeg' },
-          { src: `https://img.youtube.com/vi/${track.id}/hqdefault.jpg`, sizes: '480x360', type: 'image/jpeg' }
+          { src: `https://img.youtube.com/vi/${track.id}/hqdefault.jpg`, sizes: '480x360', type: 'image/jpeg' },
+          { src: `https://img.youtube.com/vi/${track.id}/maxresdefault.jpg`, sizes: '1280x720', type: 'image/jpeg' }
         ]
       });
     }
@@ -2545,13 +3272,10 @@
         if(e.key === 'Enter') executeDashboardPlaylistGenerationWorkflow();
       });
 
-      document.getElementById('card-trigger-albums').addEventListener('click', openYoutubeAlbumsModal);
-
       // Play All / Shuffle / Repeat
       document.getElementById('btn-play-all').addEventListener('click', executePlayAllWorkflow);
       document.getElementById('np-btn-shuffle').addEventListener('click', toggleShuffle);
       document.getElementById('np-btn-repeat').addEventListener('click', cycleRepeatMode);
-      document.getElementById('btn-close-albums').addEventListener('click', closeYoutubeAlbumsModal);
 
       // Playback speed
       document.getElementById('np-btn-speed').addEventListener('click', cyclePlaybackSpeed);
@@ -2572,6 +3296,22 @@
       });
       document.querySelectorAll('.sleep-timer-option').forEach(btn => {
         btn.addEventListener('click', () => selectSleepTimerOption(btn.getAttribute('data-minutes')));
+      });
+
+      // Custom typed duration ("Set" button or Enter key); field accepts digits + colon only
+      document.getElementById('btn-set-custom-sleep').addEventListener('click', applyCustomSleepMinutes);
+      document.getElementById('sleep-custom-minutes').addEventListener('input', (e) => {
+        e.target.value = e.target.value.replace(/[^\d:]/g, '');
+      });
+      document.getElementById('sleep-custom-minutes').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') applyCustomSleepMinutes();
+      });
+
+      // Auto-close-app toggle (whole row is tappable; Space/Enter for keyboards)
+      const autoCloseRow = document.getElementById('row-sleep-autoclose');
+      autoCloseRow.addEventListener('click', toggleSleepAutoClose);
+      autoCloseRow.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleSleepAutoClose(); }
       });
 
       // Up Next / Queue view
@@ -2682,94 +3422,6 @@
       });
     }
 
-    async function openYoutubeAlbumsModal() {
-      const container = document.getElementById('albums-ajax-payload-target');
-      document.getElementById('modal-youtube-albums').classList.remove('hidden');
-      
-      container.innerHTML = `
-        <div class="loading-spinner-wrapper">
-          <div class="spinner"></div>
-          <p>Syncing with YouTube Engine...</p>
-        </div>
-      `;
-
-      try {
-        const url = `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=25&playlistId=${TARGET_PLAYLIST_ID}&key=${YOUTUBE_API_KEY}`;
-        const response = await fetch(url);
-        if (!response.ok) throw new Error("API Channel handshake failed");
-        const data = await response.json();
-        renderAlbumsModalData(data.items);
-      } catch (error) {
-        console.error(error);
-        container.innerHTML = `
-          <div style="color:var(--danger-color); text-align:center; font-size:13px; padding:20px 10px; font-weight:600;">
-            Engine Failed to fetch YouTube stream. Verify API Key limits or connection setup.
-          </div>
-        `;
-      }
-    }
-
-    function closeYoutubeAlbumsModal() {
-      document.getElementById('modal-youtube-albums').classList.add('hidden');
-    }
-
-    function renderAlbumsModalData(items) {
-      const container = document.getElementById('albums-ajax-payload-target');
-      if (!items || items.length === 0) {
-        container.innerHTML = `<div style="color:var(--text-muted); text-align:center; font-size:13px; padding:25px;">No albums elements verified inside target location.</div>`;
-        return;
-      }
-      container.innerHTML = "";
-      
-      items.forEach(item => {
-        const snippet = item.snippet;
-        const videoId = snippet.resourceId ? snippet.resourceId.videoId : null;
-        if (!videoId) return;
-
-        const title = snippet.title || "Private Video Asset";
-        const author = snippet.videoOwnerChannelTitle || snippet.channelTitle || "Unknown Artist";
-        const thumb = snippet.thumbnails && snippet.thumbnails.default ? snippet.thumbnails.default.url : 'https://img.youtube.com/vi/' + videoId + '/default.jpg';
-
-        const row = document.createElement('div');
-        row.className = 'album-item-row';
-        row.setAttribute('onclick', `directInjectTrackFromAlbum('${videoId}', \`${escapeStringLiteral(title)}\`)`);
-        
-        row.innerHTML = `
-          <img src="${thumb}" class="album-item-thumb" alt="Cover">
-          <div class="album-item-info">
-            <div class="album-item-title">${title}</div>
-            <div class="album-item-author">${author}</div>
-          </div>
-          <div class="yt-badge">Link</div>
-        `;
-        container.appendChild(row);
-      });
-    }
-
-    function directInjectTrackFromAlbum(videoId, trackTitle) {
-      if(trackLibrary.some(t => t.id === videoId)) {
-        triggerSystemToast("Track already registered in system core");
-        closeYoutubeAlbumsModal();
-        bootstrapSelectedTrack(videoId);
-        return;
-      }
-
-      const injectedAsset = { id: videoId, title: trackTitle, type: 'online', favorite: false };
-      trackLibrary.push(injectedAsset);
-      localStorage.setItem('sonata_library', JSON.stringify(trackLibrary));
-      syncToCloud(() => window.SonataCloud.saveTrack(injectedAsset));
-      
-      triggerSystemToast("Asset Synced Successfully");
-      closeYoutubeAlbumsModal();
-      renderAppMetrics();
-      renderTracksDashboard();
-      bootstrapSelectedTrack(videoId);
-    }
-
-    function escapeStringLiteral(str) {
-      return str.replace(/`/g, '\\`').replace(/"/g, '&quot;').replace(/'/g, "\\'");
-    }
-
     function parseAndCommitYoutubeUrl(url) {
       const playlistMatch = url.match(/[?&]list=([^#&?]+)/);
       if (playlistMatch && playlistMatch[1]) {
@@ -2837,7 +3489,6 @@
     }
 
     function renderAppMetrics() {
-      document.getElementById('cnt-album').innerText = "1";
       document.getElementById('cnt-playlists').innerText = playlistLibrary.length;
     }
 
@@ -2852,26 +3503,44 @@
 
     function renderPlaylistsDashboardModal() {
       const targetList = document.getElementById('dashboard-playlists-target-list');
+      const subtitle = document.getElementById('vault-count-subtitle');
       targetList.innerHTML = "";
-      
+
+      if (subtitle) {
+        subtitle.innerText = playlistLibrary.length === 0
+          ? "Your spaces will live here"
+          : `${playlistLibrary.length} space${playlistLibrary.length === 1 ? '' : 's'} · tap one to open it`;
+      }
+
       if(playlistLibrary.length === 0) {
-        targetList.innerHTML = `<div style="color:var(--text-muted); font-size:13px; text-align:center; padding:12px;">No active structural playlists configured.</div>`;
+        targetList.innerHTML = `
+          <div class="vault-empty">
+            <div class="vault-empty-icon">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
+            </div>
+            <p>No playlists yet.<br>Create your first space below.</p>
+          </div>`;
         return;
       }
 
-      playlistLibrary.forEach(p => {
+      playlistLibrary.forEach((p, idx) => {
         const row = document.createElement('div');
-        row.className = "playlist-selector-item";
-        row.style.display = "flex";
-        row.style.justifyContent = "space-between";
-        row.style.alignItems = "center";
-        
+        row.className = "vault-card";
+        // Each playlist gets a stable color identity: the accent gradient
+        // rotated around the hue wheel by its position in the vault.
+        const hue = (idx * 47) % 360;
+
         row.innerHTML = `
-          <div style="flex-grow:1; display:flex; flex-direction:column; cursor:pointer;" onclick="selectPlaylistFromDashboard('${p.id}')">
-            <span>${p.name}</span>
-            <span style="font-size:11px; color:var(--text-muted); margin-top:2px;">${p.tracks.length} Tracks</span>
+          <div class="vault-card-main" onclick="selectPlaylistFromDashboard('${p.id}')">
+            <div class="vault-art" style="--vault-hue: ${hue}deg;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
+            </div>
+            <div class="vault-card-info">
+              <span class="vault-card-name">${p.name}</span>
+              <span class="vault-card-count">${p.tracks.length} track${p.tracks.length === 1 ? '' : 's'}</span>
+            </div>
           </div>
-          <div style="display:flex; gap:10px;" onclick="event.stopPropagation();">
+          <div class="vault-card-actions" onclick="event.stopPropagation();">
             <button class="strip-control-btn" onclick="renamePlaylistWorkflow('${p.id}')" title="Rename Playlist" style="color: var(--accent-color);">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
             </button>
@@ -3153,8 +3822,6 @@
       strip.className = `track-strip ${isActive ? 'active-strip' : ''}`;
       strip.id = `strip-target-${track.id}`;
 
-      const thumbnailSrc = `https://img.youtube.com/vi/${track.id}/hqdefault.jpg`;
-
       strip.innerHTML = `
         <div class="swipe-bg swipe-bg-favorite">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
@@ -3171,9 +3838,6 @@
               <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.6"></circle><circle cx="15" cy="6" r="1.6"></circle><circle cx="9" cy="12" r="1.6"></circle><circle cx="15" cy="12" r="1.6"></circle><circle cx="9" cy="18" r="1.6"></circle><circle cx="15" cy="18" r="1.6"></circle></svg>
             </div>
             ` : ''}
-            <div class="track-banner">
-              <img src="${thumbnailSrc}" alt="Cover Thumbnail">
-            </div>
             <div class="track-details">
               <div class="track-title">${track.title}</div>
               <div class="track-status">${isActive ? 'Now Playing' : 'Not Playing'}</div>
@@ -3527,19 +4191,69 @@
     }
 
     function selectSleepTimerOption(rawValue) {
-      clearSleepTimer(false);
       if (rawValue === 'end') {
+        clearSleepTimer(false);
         sleepTimerMode = 'end';
         triggerSystemToast("Sleep timer: stopping at end of this track");
-      } else {
-        const minutes = parseInt(rawValue, 10);
-        sleepTimerMode = minutes;
-        sleepTimerHandle = setTimeout(fireSleepTimer, minutes * 60000);
-        triggerSystemToast(`Sleep timer set: ${minutes} min`);
+        updateSleepTimerBadge();
+        updateSleepTimerModalUI();
+        closeSleepTimerModal();
+        return;
       }
+      startSleepTimerSeconds(parseInt(rawValue, 10) * 60);
+    }
+
+    // Seconds-precise core: presets pass minutes*60, the custom field can
+    // pass any second count (so 0:05 really fires in exactly 5 seconds).
+    function startSleepTimerSeconds(totalSeconds) {
+      clearSleepTimer(false);
+      sleepTimerMode = totalSeconds / 60; // keeps preset-button highlighting working (10:00 === the "10 min" pill)
+      sleepTimerEndsAt = Date.now() + totalSeconds * 1000;
+      sleepTimerHandle = setTimeout(fireSleepTimer, totalSeconds * 1000);
+      triggerSystemToast(`Sleep timer set: ${formatSleepCountdown(totalSeconds * 1000)}`);
       updateSleepTimerBadge();
       updateSleepTimerModalUI();
       closeSleepTimerModal();
+    }
+
+    // Custom typed duration. Three accepted shapes:
+    //   "5"      → no leading zero, plain number = MINUTES  (5 = 5 min)
+    //   "05"     → leading zero = SECONDS                   (05 = 5 sec, 090 = 90 sec)
+    //   "mm:ss"  → explicit clock format still works        (1:30 = 90 sec)
+    // The confirmation toast always spells out the parsed duration, so a
+    // mis-typed leading zero is immediately visible to the user.
+    // Range: 1 second up to 12 hours.
+    function applyCustomSleepMinutes() {
+      const input = document.getElementById('sleep-custom-minutes');
+      const raw = input.value.trim();
+      let totalSeconds = 0;
+
+      const clockMatch = raw.match(/^(\d{1,3}):([0-5]?\d)$/);
+      if (clockMatch) {
+        totalSeconds = parseInt(clockMatch[1], 10) * 60 + parseInt(clockMatch[2], 10);
+      } else if (/^0\d{1,4}$/.test(raw)) {
+        totalSeconds = parseInt(raw, 10); // leading zero → seconds
+      } else if (/^[1-9]\d{0,2}$/.test(raw)) {
+        totalSeconds = parseInt(raw, 10) * 60; // plain number → minutes
+      }
+
+      if (!totalSeconds || totalSeconds < 1 || totalSeconds > 720 * 60) {
+        triggerSystemToast("Try: 5 = 5 min, 05 = 5 sec, or mm:ss");
+        input.focus();
+        return;
+      }
+      input.value = '';
+      input.blur();
+      startSleepTimerSeconds(totalSeconds);
+    }
+
+    function toggleSleepAutoClose() {
+      sleepAutoCloseApp = !sleepAutoCloseApp;
+      localStorage.setItem('sonata_sleep_autoclose', sleepAutoCloseApp ? '1' : '0');
+      updateSleepTimerModalUI();
+      triggerSystemToast(sleepAutoCloseApp
+        ? "Sonata will close itself when the timer ends"
+        : "Auto-close off — timer will only pause music");
     }
 
     function clearSleepTimer(showToast) {
@@ -3548,6 +4262,7 @@
         sleepTimerHandle = null;
       }
       sleepTimerMode = null;
+      sleepTimerEndsAt = null;
       updateSleepTimerBadge();
       updateSleepTimerModalUI();
       if (showToast) triggerSystemToast("Sleep timer off");
@@ -3562,7 +4277,29 @@
       if (playBtn) playBtn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>`;
       updateMediaSessionPlaybackState('paused');
       syncNowPlayingPlayButton();
-      triggerSystemToast("Sleep timer ended — playback paused");
+      if (sleepAutoCloseApp) {
+        executeSleepAutoClose();
+      } else {
+        triggerSystemToast("Sleep timer ended — playback paused");
+      }
+    }
+
+    // Attempts to shut the app window after the timer fires. window.close()
+    // is only honored by the browser in certain contexts (installed PWA
+    // windows on Android usually allow it; a regular browser tab that the
+    // user navigated to usually doesn't). Playback is fully stopped first,
+    // so even when the close is refused the outcome is still "music off".
+    function executeSleepAutoClose() {
+      try { if (ytPlayer && ytPlayer.stopVideo) ytPlayer.stopVideo(); } catch (e) {}
+      updateMediaSessionPlaybackState('none');
+      triggerSystemToast("Sleep timer done — closing Sonata…");
+      setTimeout(() => {
+        window.close();
+        // Only runs if the browser refused to close the window.
+        setTimeout(() => {
+          triggerSystemToast("Browser blocked auto-close — playback stopped instead");
+        }, 700);
+      }, 1200);
     }
 
     function updateSleepTimerBadge() {
@@ -3570,18 +4307,43 @@
       if (btn) btn.classList.toggle('toggle-active', !!sleepTimerMode);
     }
 
+    function formatSleepCountdown(msLeft) {
+      const totalSec = Math.max(Math.ceil(msLeft / 1000), 0);
+      const h = Math.floor(totalSec / 3600);
+      const m = Math.floor((totalSec % 3600) / 60);
+      const s = totalSec % 60;
+      if (h > 0) return `${h}h ${String(m).padStart(2, '0')}m`;
+      if (m > 0) return `${m}m ${String(s).padStart(2, '0')}s`;
+      return `${s}s`;
+    }
+
     function updateSleepTimerModalUI() {
-      const status = document.getElementById('sleep-timer-status');
-      if (status) {
-        if (sleepTimerMode === 'end') status.innerText = "Music will stop after the current track finishes.";
-        else if (sleepTimerMode) status.innerText = `Music will pause in about ${sleepTimerMode} minutes.`;
-        else status.innerText = "Music will pause automatically once the timer runs out.";
-      }
+      refreshSleepCountdownStatus();
       document.querySelectorAll('.sleep-timer-option').forEach(btn => {
         const val = btn.getAttribute('data-minutes');
         const isSelected = (sleepTimerMode === 'end' && val === 'end') || (sleepTimerMode === parseInt(val, 10));
         btn.classList.toggle('selected', isSelected);
       });
+      const row = document.getElementById('row-sleep-autoclose');
+      if (row) {
+        row.classList.toggle('on', sleepAutoCloseApp);
+        row.setAttribute('aria-checked', sleepAutoCloseApp ? 'true' : 'false');
+      }
+    }
+
+    // Status line with a live ticking countdown while the modal is open.
+    // Called every UI tick from the timeline ticker, so it's cheap-guarded.
+    function refreshSleepCountdownStatus() {
+      const status = document.getElementById('sleep-timer-status');
+      if (!status) return;
+      const closeSuffix = sleepAutoCloseApp ? " Sonata will then close itself." : "";
+      if (sleepTimerMode === 'end') {
+        status.innerText = "Music will stop after the current track finishes." + closeSuffix;
+      } else if (sleepTimerMode && sleepTimerEndsAt) {
+        status.innerText = `Music will pause in ${formatSleepCountdown(sleepTimerEndsAt - Date.now())}.` + closeSuffix;
+      } else {
+        status.innerText = "Music will pause automatically once the timer runs out.";
+      }
     }
 
     // --- UP NEXT / QUEUE VIEW ---
@@ -3729,7 +4491,11 @@
       if (sleepTimerMode === 'end') {
         clearSleepTimer(false);
         stopPlaybackAtQueueEnd();
-        triggerSystemToast("Sleep timer ended — playback paused");
+        if (sleepAutoCloseApp) {
+          executeSleepAutoClose();
+        } else {
+          triggerSystemToast("Sleep timer ended — playback paused");
+        }
         return;
       }
       if (repeatMode === 'one' && ytPlayer) {
@@ -3788,11 +4554,17 @@
         if(npCurrent) npCurrent.innerText = formatTimeStrings(currentTime);
         if(npDuration) npDuration.innerText = formatTimeStrings(duration);
 
+        // Live sleep-timer countdown, only while its modal is actually open
+        const sleepModal = document.getElementById('modal-sleep-timer');
+        if (sleepTimerEndsAt && sleepModal && !sleepModal.classList.contains('hidden')) {
+          refreshSleepCountdownStatus();
+        }
+
         if ('mediaSession' in navigator && navigator.mediaSession.setPositionState && duration > 0) {
           try {
             navigator.mediaSession.setPositionState({
               duration: duration,
-              playbackRate: 1,
+              playbackRate: playbackSpeed || 1,
               position: Math.min(currentTime, duration)
             });
           } catch (err) {
