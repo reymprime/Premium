@@ -2573,6 +2573,268 @@
       }
     }
 
+    /* ---- PERMISSIONS GATE ---- */
+    .perm-shell {
+      max-width: 380px;
+      align-items: center;
+      text-align: center;
+      gap: 16px;
+    }
+
+    .perm-hero-icon {
+      width: 66px;
+      height: 66px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      background: var(--accent-gradient);
+      box-shadow:
+        0 12px 30px rgba(var(--accent-rgb), 0.40),
+        inset 0 2px 0 rgba(255, 255, 255, 0.40),
+        inset 0 -3px 5px rgba(0, 0, 0, 0.25);
+    }
+
+    .perm-title {
+      font-size: 24px;
+      font-weight: 900;
+      letter-spacing: -0.8px;
+      background: var(--heading-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .perm-sub {
+      font-size: 12.5px;
+      color: var(--text-muted);
+      font-weight: 500;
+      line-height: 1.55;
+      margin-top: -8px;
+    }
+
+    .perm-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .perm-row {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      text-align: left;
+      background: var(--glass-surface);
+      border: 1px solid var(--glass-border);
+      border-radius: 18px;
+      padding: 12px 14px;
+    }
+
+    .perm-ic {
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent-color);
+      background: rgba(var(--accent-rgb), 0.10);
+      border: 1px solid rgba(var(--accent-rgb), 0.22);
+    }
+
+    .perm-row-text {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+    }
+    .perm-row-text span {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+    .perm-row-text small {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 500;
+      line-height: 1.45;
+    }
+
+    .perm-allow {
+      width: 100%;
+      height: 48px;
+      font-size: 14.5px;
+    }
+
+    /* ---- SMOOTHNESS PASS ----
+       Off-screen track cards skip layout/paint entirely, so a large
+       library scrolls like a short one. The intrinsic size keeps the
+       scrollbar geometry stable while cards are skipped. */
+    .track-strip {
+      content-visibility: auto;
+      contain-intrinsic-size: auto 74px;
+    }
+    .track-strip.active-strip {
+      content-visibility: visible;
+    }
+
+    /* ---- EQUALIZER RACK ---- */
+    /* Opened from inside the Now Playing card (z-index 1500), so the EQ
+       must stack above it — and above confirmation dialogs (2001). */
+    #modal-equalizer { z-index: 2100; }
+
+    .eq-shell { max-width: 400px; gap: 18px; }
+
+    .eq-bands {
+      display: flex;
+      justify-content: space-between;
+      padding: 14px 6px 10px;
+      background: var(--glass-surface);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+      transition: opacity 0.3s ease, filter 0.3s ease;
+    }
+    .eq-bands.eq-rack-off {
+      opacity: 0.45;
+      filter: saturate(0.4);
+    }
+
+    .eq-band {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      flex: 1;
+    }
+
+    .eq-db {
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--accent-color);
+      font-variant-numeric: tabular-nums;
+      min-height: 14px;
+    }
+
+    .eq-freq {
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      color: var(--text-muted);
+    }
+
+    /* Vertical slider: a rotated range input inside a fixed shaft */
+    .eq-slider-shaft {
+      position: relative;
+      width: 40px;
+      height: 136px;
+    }
+    .eq-slider-shaft input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 136px;
+      height: 40px;
+      transform: translate(-50%, -50%) rotate(-90deg);
+      background: transparent;
+      cursor: pointer;
+      touch-action: none;
+    }
+    .eq-slider-shaft input[type="range"]::-webkit-slider-runnable-track {
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.10);
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.35);
+    }
+    [data-theme="light"] .eq-slider-shaft input[type="range"]::-webkit-slider-runnable-track {
+      background: rgba(15, 23, 42, 0.12);
+    }
+    .eq-slider-shaft input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 20px;
+      height: 20px;
+      margin-top: -7px;
+      border-radius: 50%;
+      background: linear-gradient(180deg, #ffffff 0%, #dbe2ee 100%);
+      box-shadow:
+        0 2px 8px rgba(0, 0, 0, 0.45),
+        0 0 10px rgba(var(--accent-rgb), 0.45),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9);
+      border: 2px solid rgba(var(--accent-rgb), 0.85);
+    }
+    .eq-slider-shaft input[type="range"]::-moz-range-track {
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.10);
+    }
+    .eq-slider-shaft input[type="range"]::-moz-range-thumb {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #ffffff;
+      border: 2px solid rgba(var(--accent-rgb), 0.85);
+      box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.45);
+    }
+
+    .eq-presets {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    .eq-presets .sleep-timer-option {
+      font-size: 12px;
+      padding: 10px 4px;
+    }
+
+    /* ---- LIVE WAVE COVER ---- */
+    .np-wave-canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      background:
+        radial-gradient(80% 60% at 50% 45%, rgba(var(--accent-rgb), 0.16) 0%, transparent 75%),
+        var(--glass-surface);
+    }
+    [data-theme="light"] .np-wave-canvas {
+      background:
+        radial-gradient(80% 60% at 50% 45%, rgba(var(--accent-rgb), 0.10) 0%, transparent 75%),
+        rgba(255, 255, 255, 0.65);
+    }
+
+    /* ---- STICKY-HOVER FIX ----
+       On touchscreens a tap applies :hover and it stays applied until the
+       next tap elsewhere. The generic .strip-control-btn:hover repaint was
+       overpowering the play ring's accent gradient (higher specificity),
+       so tapping play/pause visibly erased the theme color.
+       Fix 1: on hover-less devices, taps don't repaint small controls. */
+    @media (hover: none) {
+      .strip-control-btn:hover {
+        color: var(--text-muted);
+        background: var(--glass-surface);
+        border-color: var(--glass-border);
+        transform: none;
+        box-shadow:
+          0 3px 8px rgba(0, 0, 0, 0.18),
+          inset 0 1px 0 rgba(255, 255, 255, 0.12),
+          inset 0 -1.5px 2px rgba(0, 0, 0, 0.14);
+      }
+    }
+
+    /* Fix 2: the play rings keep their accent gradient in EVERY state —
+       this (0,3,0) selector outranks the generic hover on all devices. */
+    .strip-control-btn.dock-play-ring,
+    .strip-control-btn.dock-play-ring:hover,
+    .strip-control-btn.dock-play-ring:focus,
+    .strip-control-btn.dock-play-ring:active {
+      background: var(--accent-gradient);
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+
     /* Respect users who turn animation off — quality floor, silently */
     @media (prefers-reduced-motion: reduce) {
       body::after { animation: none; }
@@ -2612,6 +2874,9 @@
       <div id="iframe-target"></div>
     </div>
 
+    <audio id="local-audio-engine" preload="auto" class="hidden"></audio>
+    <input type="file" id="local-import-input" accept="audio/*" multiple class="hidden">
+
     <div class="hero-cards">
       <div class="nav-card" id="card-trigger-playlists">
         <span class="count-tag" id="cnt-playlists">0</span>
@@ -2634,6 +2899,9 @@
           </button>
           <button class="icon-btn" id="btn-toggle-video" style="width:38px; height:38px;" title="Show / hide video">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="eye-icon-svg"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+          </button>
+          <button class="icon-btn" id="btn-import-local" style="width:38px; height:38px;" title="Import audio from device">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle><line x1="3" y1="3" x2="7" y2="3"></line><line x1="5" y1="1" x2="5" y2="5"></line></svg>
           </button>
           <button class="icon-btn" id="btn-open-queue-view" style="width:38px; height:38px;" title="Up Next">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="15" y2="18"></line><circle cx="4" cy="6" r="1.5" fill="currentColor" stroke="none"></circle><circle cx="4" cy="12" r="1.5" fill="currentColor" stroke="none"></circle><circle cx="4" cy="18" r="1.5" fill="currentColor" stroke="none"></circle></svg>
@@ -2688,6 +2956,7 @@
       <div class="now-playing-handle" id="np-handle"></div>
       <div class="now-playing-art-wrap">
         <img id="np-art" class="now-playing-art" src="" alt="Album Art" onerror="this.onerror=null; this.src=this.src.replace('maxresdefault','hqdefault');">
+        <canvas id="np-wave-canvas" class="np-wave-canvas hidden"></canvas>
       </div>
       <div class="now-playing-meta">
         <div class="now-playing-title" id="np-title">Select a Track</div>
@@ -2726,6 +2995,9 @@
         </button>
         <button class="np-extra-btn" id="np-btn-sleep" title="Sleep timer">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        </button>
+        <button class="np-extra-btn" id="np-btn-eq" title="Equalizer">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg>
         </button>
       </div>
 
@@ -2807,6 +3079,13 @@
           <div class="luxury-theme-pill" data-theme-val="light">Light</div>
           <div class="luxury-theme-pill" data-theme-val="green">Emerald</div>
         </div>
+      </div>
+
+      <div class="setting-row">
+        <span class="setting-label">Privacy &amp; Permissions</span>
+        <button class="icon-btn" id="btn-open-permissions" style="width:36px; height:36px; color: var(--accent-color);">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+        </button>
       </div>
 
       <div class="setting-row-vertical">
@@ -2915,6 +3194,71 @@
           <button class="playlist-create-btn" id="btn-dashboard-create-playlist">Create</button>
         </div>
       </div>
+    </div>
+  </div>
+
+  <div class="settings-modal hidden" id="modal-equalizer">
+    <div class="playlist-modal-content eq-shell">
+      <div class="vault-header">
+        <div>
+          <h3 style="font-weight: 800; font-size: 20px; letter-spacing: -0.5px;">Equalizer</h3>
+          <p style="font-size: 12px; color: var(--text-muted); margin-top: 2px;" id="eq-context-note">Shapes offline vault playback</p>
+        </div>
+        <button class="icon-btn" id="btn-close-eq" style="width:36px; height:36px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+
+      <div class="sleep-autoclose-row" id="row-eq-enabled" role="switch" aria-checked="false" tabindex="0">
+        <div class="sleep-autoclose-label">
+          <span>Enable equalizer</span>
+          <small>Applies to songs from your offline vault</small>
+        </div>
+        <div class="lux-switch" id="switch-eq-enabled"><div class="lux-switch-knob"></div></div>
+      </div>
+
+      <div class="eq-bands" id="eq-bands-rack">
+        <div class="eq-band"><span class="eq-db" id="eq-db-0">0</span><div class="eq-slider-shaft"><input type="range" min="-12" max="12" step="1" value="0" data-band="0"></div><span class="eq-freq">60</span></div>
+        <div class="eq-band"><span class="eq-db" id="eq-db-1">0</span><div class="eq-slider-shaft"><input type="range" min="-12" max="12" step="1" value="0" data-band="1"></div><span class="eq-freq">230</span></div>
+        <div class="eq-band"><span class="eq-db" id="eq-db-2">0</span><div class="eq-slider-shaft"><input type="range" min="-12" max="12" step="1" value="0" data-band="2"></div><span class="eq-freq">910</span></div>
+        <div class="eq-band"><span class="eq-db" id="eq-db-3">0</span><div class="eq-slider-shaft"><input type="range" min="-12" max="12" step="1" value="0" data-band="3"></div><span class="eq-freq">3.6k</span></div>
+        <div class="eq-band"><span class="eq-db" id="eq-db-4">0</span><div class="eq-slider-shaft"><input type="range" min="-12" max="12" step="1" value="0" data-band="4"></div><span class="eq-freq">14k</span></div>
+      </div>
+
+      <div class="eq-presets" id="eq-presets-row">
+        <button class="sleep-timer-option eq-preset" data-preset="flat">Flat</button>
+        <button class="sleep-timer-option eq-preset" data-preset="bass">Bass Boost</button>
+        <button class="sleep-timer-option eq-preset" data-preset="vocal">Vocal</button>
+        <button class="sleep-timer-option eq-preset" data-preset="treble">Treble</button>
+        <button class="sleep-timer-option eq-preset" data-preset="electronic">Electronic</button>
+        <button class="sleep-timer-option eq-preset" data-preset="rock">Rock</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="settings-modal hidden" id="modal-permissions">
+    <div class="playlist-modal-content perm-shell">
+      <div class="perm-hero-icon">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><polyline points="9 12 11 14 15 10"></polyline></svg>
+      </div>
+      <h3 class="perm-title">Allow Sonata</h3>
+      <p class="perm-sub">Sonata asks once for what it needs. Nothing runs without your permission.</p>
+      <div class="perm-list">
+        <div class="perm-row">
+          <div class="perm-ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg></div>
+          <div class="perm-row-text"><span>Protected storage</span><small>Keeps your library and offline songs safe from system cleanup</small></div>
+        </div>
+        <div class="perm-row">
+          <div class="perm-ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg></div>
+          <div class="perm-row-text"><span>Media controls</span><small>Lock screen and notification playback controls</small></div>
+        </div>
+        <div class="perm-row">
+          <div class="perm-ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></div>
+          <div class="perm-row-text"><span>Timers &amp; auto-close</span><small>Sleep timer may pause music and close the app for you</small></div>
+        </div>
+      </div>
+      <button class="playlist-create-btn perm-allow" id="btn-perm-allow">Allow &amp; Continue</button>
+      <div class="delete-cancel-lnk" id="btn-perm-later" style="width:100%; flex:none;">Not now</div>
     </div>
   </div>
 
@@ -3071,26 +3415,42 @@
         triggerSystemToast("Nothing is playing yet");
         return;
       }
-      refreshNowPlayingCard();
+      // Unhide first: the wave cover's start check requires a visible modal.
       document.getElementById('modal-now-playing').classList.remove('hidden');
+      refreshNowPlayingCard();
     }
 
     function closeNowPlayingCard() {
       document.getElementById('modal-now-playing').classList.add('hidden');
+      stopNpWaveLoop();
     }
 
     function refreshNowPlayingCard() {
       const track = activeQueue[activeQueuePointer];
       if (!track) return;
       document.getElementById('np-title').innerText = track.title;
-      document.getElementById('np-art').src = `https://img.youtube.com/vi/${track.id}/maxresdefault.jpg`;
+      const npArt = document.getElementById('np-art');
+      const npWave = document.getElementById('np-wave-canvas');
+      if (track.type === 'local') {
+        npArt.classList.add('hidden');
+        npWave.classList.remove('hidden');
+        startNpWaveLoop();
+      } else {
+        stopNpWaveLoop();
+        npWave.classList.add('hidden');
+        npArt.classList.remove('hidden');
+        npArt.src = `https://img.youtube.com/vi/${track.id}/maxresdefault.jpg`;
+      }
       syncNowPlayingPlayButton();
     }
 
     function syncNowPlayingPlayButton() {
       const npPlaySvg = document.getElementById('np-play-svg');
       if (!npPlaySvg) return;
-      const isPlaying = ytPlayer && ytPlayer.getPlayerState && ytPlayer.getPlayerState() === YT.PlayerState.PLAYING;
+      const localEngine = getLocalAudio();
+      const isPlaying = isCurrentTrackLocal()
+        ? !!(localEngine && localEngine.src && !localEngine.paused)
+        : !!(ytPlayer && ytPlayer.getPlayerState && ytPlayer.getPlayerState() === YT.PlayerState.PLAYING);
       npPlaySvg.innerHTML = isPlaying
         ? `<rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect>`
         : `<polygon points="5 3 19 12 5 21 5 3"></polygon>`;
@@ -3102,31 +3462,43 @@
     function setupMediaSessionHandlers() {
       if (!('mediaSession' in navigator)) return;
 
-      navigator.mediaSession.setActionHandler('play', () => { if (ytPlayer) ytPlayer.playVideo(); });
-      navigator.mediaSession.setActionHandler('pause', () => { if (ytPlayer) ytPlayer.pauseVideo(); });
+      navigator.mediaSession.setActionHandler('play', () => {
+        if (isCurrentTrackLocal()) { const la = getLocalAudio(); if (la && la.src) la.play().catch(() => {}); return; }
+        if (ytPlayer) ytPlayer.playVideo();
+      });
+      navigator.mediaSession.setActionHandler('pause', () => {
+        if (isCurrentTrackLocal()) { const la = getLocalAudio(); if (la) la.pause(); return; }
+        if (ytPlayer) ytPlayer.pauseVideo();
+      });
       navigator.mediaSession.setActionHandler('previoustrack', executePrevTrackTrackWrap);
       navigator.mediaSession.setActionHandler('nexttrack', executeNextTrackTrackWrap);
 
       try {
         navigator.mediaSession.setActionHandler('seekto', (details) => {
-          if (ytPlayer && ytPlayer.seekTo && typeof details.seekTime === 'number') {
-            ytPlayer.seekTo(details.seekTime, true);
-          }
+          if (typeof details.seekTime !== 'number') return;
+          if (isCurrentTrackLocal()) { const la = getLocalAudio(); if (la) la.currentTime = details.seekTime; return; }
+          if (ytPlayer && ytPlayer.seekTo) ytPlayer.seekTo(details.seekTime, true);
         });
         navigator.mediaSession.setActionHandler('seekbackward', (details) => {
+          const step = details.seekOffset || 10;
+          if (isCurrentTrackLocal()) { const la = getLocalAudio(); if (la) la.currentTime = Math.max(la.currentTime - step, 0); return; }
           if (ytPlayer && ytPlayer.getCurrentTime) {
-            ytPlayer.seekTo(Math.max(ytPlayer.getCurrentTime() - (details.seekOffset || 10), 0), true);
+            ytPlayer.seekTo(Math.max(ytPlayer.getCurrentTime() - step, 0), true);
           }
         });
         navigator.mediaSession.setActionHandler('seekforward', (details) => {
+          const step = details.seekOffset || 10;
+          if (isCurrentTrackLocal()) { const la = getLocalAudio(); if (la && la.duration) la.currentTime = Math.min(la.currentTime + step, la.duration); return; }
           if (ytPlayer && ytPlayer.getCurrentTime && ytPlayer.getDuration) {
-            ytPlayer.seekTo(Math.min(ytPlayer.getCurrentTime() + (details.seekOffset || 10), ytPlayer.getDuration()), true);
+            ytPlayer.seekTo(Math.min(ytPlayer.getCurrentTime() + step, ytPlayer.getDuration()), true);
           }
         });
         // "Stop" from the notification fully ends the session (some OS UIs
         // expose it as the X / dismiss action on the media notification).
         navigator.mediaSession.setActionHandler('stop', () => {
           if (ytPlayer && ytPlayer.stopVideo) ytPlayer.stopVideo();
+          const la = getLocalAudio();
+          if (la) la.pause();
           updateMediaSessionPlaybackState('none');
         });
       } catch (err) {
@@ -3136,6 +3508,15 @@
 
     function updateMediaSessionMetadata(track) {
       if (!('mediaSession' in navigator) || !track) return;
+      if (track.type === 'local') {
+        navigator.mediaSession.metadata = new MediaMetadata({
+          title: track.title,
+          artist: 'Sonata',
+          album: 'Offline Vault',
+          artwork: [{ src: LOCAL_ART_DATA_URI, sizes: '640x640', type: 'image/svg+xml' }]
+        });
+        return;
+      }
       navigator.mediaSession.metadata = new MediaMetadata({
         title: track.title,
         artist: 'Sonata',
@@ -3294,7 +3675,7 @@
       document.getElementById('modal-sleep-timer').addEventListener('click', (e) => {
         if (e.target.id === 'modal-sleep-timer') closeSleepTimerModal();
       });
-      document.querySelectorAll('.sleep-timer-option').forEach(btn => {
+      document.querySelectorAll('#modal-sleep-timer .sleep-timer-option').forEach(btn => {
         btn.addEventListener('click', () => selectSleepTimerOption(btn.getAttribute('data-minutes')));
       });
 
@@ -3313,6 +3694,41 @@
       autoCloseRow.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleSleepAutoClose(); }
       });
+
+      // Offline device import
+      document.getElementById('btn-import-local').addEventListener('click', triggerLocalImportPicker);
+      document.getElementById('local-import-input').addEventListener('change', handleLocalAudioImport);
+
+      // Permissions gate
+      document.getElementById('btn-perm-allow').addEventListener('click', grantSonataPermissions);
+      document.getElementById('btn-perm-later').addEventListener('click', dismissPermissionsGate);
+      document.getElementById('btn-open-permissions').addEventListener('click', () => {
+        document.getElementById('modal-settings').classList.add('hidden');
+        document.getElementById('modal-permissions').classList.remove('hidden');
+      });
+
+      // Equalizer
+      document.getElementById('np-btn-eq').addEventListener('click', openEqualizerModal);
+      document.getElementById('btn-close-eq').addEventListener('click', closeEqualizerModal);
+      document.getElementById('modal-equalizer').addEventListener('click', (e) => {
+        if (e.target.id === 'modal-equalizer') closeEqualizerModal();
+      });
+      const eqRow = document.getElementById('row-eq-enabled');
+      eqRow.addEventListener('click', toggleEqualizer);
+      eqRow.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleEqualizer(); }
+      });
+      document.querySelectorAll('#eq-bands-rack input[type="range"]').forEach(input => {
+        input.addEventListener('input', (e) => {
+          setEqBand(parseInt(e.target.dataset.band, 10), parseInt(e.target.value, 10));
+        });
+      });
+      document.querySelectorAll('.eq-preset').forEach(btn => {
+        btn.addEventListener('click', () => applyEqPreset(btn.dataset.preset));
+      });
+
+      initLocalAudioEngine();
+      maybeShowPermissionsGate();
 
       // Up Next / Queue view
       document.getElementById('btn-open-queue-view').addEventListener('click', openQueueViewModal);
@@ -3725,7 +4141,9 @@
         return;
       }
       
-      filteringSubset.forEach(track => { container.appendChild(createTrackStripNode(track)); });
+      const frag = document.createDocumentFragment();
+      filteringSubset.forEach(track => { frag.appendChild(createTrackStripNode(track)); });
+      container.appendChild(frag);
     }
 
     // Keeps a most-recent-first history of played track ids (capped at 50).
@@ -3840,15 +4258,20 @@
             ` : ''}
             <div class="track-details">
               <div class="track-title">${track.title}</div>
-              <div class="track-status">${isActive ? 'Now Playing' : 'Not Playing'}</div>
+              <div class="track-status">${isActive ? 'Now Playing' : (track.type === 'local' ? 'Offline · Ready' : 'Not Playing')}</div>
             </div>
             <div class="track-actions" onclick="event.stopPropagation();">
               <button class="strip-control-btn" onclick="openPlaylistInterfacingPipeline('${track.id}')" title="Manage Playlists" style="color: var(--accent-color);">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="14" y2="6"></line><line x1="3" y1="11" x2="14" y2="11"></line><line x1="3" y1="16" x2="10" y2="16"></line><circle cx="18.5" cy="17.5" r="4.5"></circle><line x1="18.5" y1="15.5" x2="18.5" y2="19.5"></line><line x1="16.5" y1="17.5" x2="20.5" y2="17.5"></line></svg>
               </button>
+              ${track.type === 'local' ? '' : `
               <button class="strip-control-btn" onclick="executeExternalDownloadConverter('${track.id}')" title="Download">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-              </button>
+              </button>`}
+              ${isPlaylistView ? `
+              <button class="strip-control-btn btn-delete" onclick="removeTrackFromCurrentPlaylist('${track.id}')" title="Remove from this playlist">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"></circle><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+              </button>` : ''}
             </div>
           </div>
           ${isActive ? `
@@ -4108,6 +4531,8 @@
     // of tracks — pauses cleanly instead of silently doing nothing.
     function stopPlaybackAtQueueEnd() {
       if (ytPlayer && ytPlayer.pauseVideo) ytPlayer.pauseVideo();
+      const laStop = getLocalAudio();
+      if (laStop && !laStop.paused) laStop.pause();
       clearInterval(timelineUpdateInterval);
       document.getElementById('dock-wave').classList.remove('playing');
       document.getElementById('dock-btn-play').innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>`;
@@ -4122,6 +4547,8 @@
       playbackSpeed = SPEED_STEPS[(idx + 1) % SPEED_STEPS.length];
       localStorage.setItem('sonata_speed', playbackSpeed);
       if (ytPlayer && ytPlayer.setPlaybackRate) ytPlayer.setPlaybackRate(playbackSpeed);
+      const laRate = getLocalAudio();
+      if (laRate) laRate.playbackRate = playbackSpeed;
       updateSpeedButtonLabel();
       triggerSystemToast(`Speed: ${playbackSpeed}x`);
     }
@@ -4139,6 +4566,8 @@
       currentVolume = Math.max(0, Math.min(100, vol));
       localStorage.setItem('sonata_volume', currentVolume);
       if (ytPlayer && ytPlayer.setVolume) ytPlayer.setVolume(currentVolume);
+      const laVol = getLocalAudio();
+      if (laVol) laVol.volume = currentVolume / 100;
       updateVolumeUI();
     }
 
@@ -4206,6 +4635,7 @@
     // Seconds-precise core: presets pass minutes*60, the custom field can
     // pass any second count (so 0:05 really fires in exactly 5 seconds).
     function startSleepTimerSeconds(totalSeconds) {
+      if (!Number.isFinite(totalSeconds) || totalSeconds < 1) return;
       clearSleepTimer(false);
       sleepTimerMode = totalSeconds / 60; // keeps preset-button highlighting working (10:00 === the "10 min" pill)
       sleepTimerEndsAt = Date.now() + totalSeconds * 1000;
@@ -4270,6 +4700,8 @@
 
     function fireSleepTimer() {
       if (ytPlayer && ytPlayer.pauseVideo) ytPlayer.pauseVideo();
+      const laSleep = getLocalAudio();
+      if (laSleep && !laSleep.paused) laSleep.pause();
       clearSleepTimer(false);
       const wave = document.getElementById('dock-wave');
       const playBtn = document.getElementById('dock-btn-play');
@@ -4291,6 +4723,8 @@
     // so even when the close is refused the outcome is still "music off".
     function executeSleepAutoClose() {
       try { if (ytPlayer && ytPlayer.stopVideo) ytPlayer.stopVideo(); } catch (e) {}
+      const laClose = getLocalAudio();
+      if (laClose) { laClose.pause(); laClose.removeAttribute('src'); }
       updateMediaSessionPlaybackState('none');
       triggerSystemToast("Sleep timer done — closing Sonata…");
       setTimeout(() => {
@@ -4319,7 +4753,7 @@
 
     function updateSleepTimerModalUI() {
       refreshSleepCountdownStatus();
-      document.querySelectorAll('.sleep-timer-option').forEach(btn => {
+      document.querySelectorAll('#modal-sleep-timer .sleep-timer-option').forEach(btn => {
         const val = btn.getAttribute('data-minutes');
         const isSelected = (sleepTimerMode === 'end' && val === 'end') || (sleepTimerMode === parseInt(val, 10));
         btn.classList.toggle('selected', isSelected);
@@ -4407,6 +4841,422 @@
       }
     }
 
+    // ================================================================
+    // OFFLINE VAULT — device-imported audio stored in IndexedDB and
+    // played through a hidden <audio> engine, side by side with the
+    // YouTube engine. Every transport control branches on the current
+    // track's type, so both engines share one set of UI controls.
+    // ================================================================
+    const PLAY_SVG_MARKUP = `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>`;
+    const PAUSE_SVG_MARKUP = `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>`;
+    const LOCAL_ART_DATA_URI = 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="640" height="640"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6366f1"/><stop offset="1" stop-color="#a855f7"/></linearGradient></defs><rect width="640" height="640" fill="url(#g)"/><text x="50%" y="57%" font-size="230" text-anchor="middle" fill="rgba(255,255,255,0.92)" font-family="Arial">&#9834;</text></svg>');
+
+    let offlineDbPromise = null;
+    function openOfflineDB() {
+      if (!offlineDbPromise) {
+        offlineDbPromise = new Promise((resolve, reject) => {
+          const req = indexedDB.open('SonataOfflineVault', 1);
+          req.onupgradeneeded = () => req.result.createObjectStore('audio');
+          req.onsuccess = () => resolve(req.result);
+          req.onerror = () => reject(req.error);
+        });
+      }
+      return offlineDbPromise;
+    }
+    function idbPutAudio(id, blob) {
+      return openOfflineDB().then(db => new Promise((res, rej) => {
+        const tx = db.transaction('audio', 'readwrite');
+        tx.objectStore('audio').put(blob, id);
+        tx.oncomplete = res;
+        tx.onerror = () => rej(tx.error);
+      }));
+    }
+    function idbGetAudio(id) {
+      return openOfflineDB().then(db => new Promise((res, rej) => {
+        const req = db.transaction('audio', 'readonly').objectStore('audio').get(id);
+        req.onsuccess = () => res(req.result || null);
+        req.onerror = () => rej(req.error);
+      }));
+    }
+    function idbDeleteAudio(id) {
+      return openOfflineDB().then(db => new Promise((res, rej) => {
+        const tx = db.transaction('audio', 'readwrite');
+        tx.objectStore('audio').delete(id);
+        tx.oncomplete = res;
+        tx.onerror = () => rej(tx.error);
+      }));
+    }
+
+    function isCurrentTrackLocal() {
+      const t = activeQueue[activeQueuePointer];
+      return !!(t && t.type === 'local');
+    }
+    function getLocalAudio() {
+      return document.getElementById('local-audio-engine');
+    }
+
+    // One place to flip every play/pause surface (dock, wave, Now Playing,
+    // media session) so the two engines can't drift out of sync.
+    function syncTransportUiPlaying(isPlaying) {
+      const wave = document.getElementById('dock-wave');
+      const playBtn = document.getElementById('dock-btn-play');
+      if (wave) wave.classList.toggle('playing', isPlaying);
+      if (playBtn) playBtn.innerHTML = isPlaying ? PAUSE_SVG_MARKUP : PLAY_SVG_MARKUP;
+      updateMediaSessionPlaybackState(isPlaying ? 'playing' : 'paused');
+      syncNowPlayingPlayButton();
+    }
+
+    function initLocalAudioEngine() {
+      const la = getLocalAudio();
+      if (!la) return;
+      la.addEventListener('ended', () => { if (isCurrentTrackLocal()) handleTrackFinishedPlaying(); });
+      la.addEventListener('play', () => { if (isCurrentTrackLocal()) syncTransportUiPlaying(true); });
+      la.addEventListener('pause', () => { if (isCurrentTrackLocal() && !la.ended) syncTransportUiPlaying(false); });
+      la.addEventListener('error', () => { if (isCurrentTrackLocal()) triggerSystemToast("Offline audio failed to load"); });
+    }
+
+    async function bootstrapLocalAudioPlayback(trackId) {
+      const la = getLocalAudio();
+      if (!la) return;
+      // Must run before the first await: AudioContext creation/resume only
+      // succeeds inside a user gesture's synchronous call stack.
+      ensureEqGraph();
+      try {
+        const blob = await idbGetAudio(trackId);
+        if (!blob) { triggerSystemToast("Offline audio missing from vault"); return; }
+        if (la.dataset.objectUrl) URL.revokeObjectURL(la.dataset.objectUrl);
+        const url = URL.createObjectURL(blob);
+        la.dataset.objectUrl = url;
+        la.src = url;
+        la.playbackRate = playbackSpeed || 1;
+        la.volume = currentVolume / 100;
+        applyEqGains();
+        la.play().catch(() => {});
+      } catch (err) {
+        console.error(err);
+        triggerSystemToast("Could not open offline audio");
+      }
+    }
+
+    function triggerLocalImportPicker() {
+      document.getElementById('local-import-input').click();
+    }
+
+    async function handleLocalAudioImport(e) {
+      const files = Array.from(e.target.files || []);
+      if (!files.length) return;
+      triggerSystemToast(`Importing ${files.length} file${files.length === 1 ? '' : 's'}…`);
+      let imported = 0;
+      for (const file of files) {
+        if (!file.type.startsWith('audio/')) continue;
+        const id = 'local-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7);
+        try {
+          await idbPutAudio(id, file);
+          trackLibrary.push({ id, title: file.name.replace(/\.[^.]+$/, ''), type: 'local', favorite: false });
+          imported++;
+        } catch (err) { console.error('Import failed for', file.name, err); }
+      }
+      e.target.value = '';
+      if (imported) {
+        localStorage.setItem('sonata_library', JSON.stringify(trackLibrary));
+        renderAppMetrics();
+        renderTracksDashboard();
+        triggerSystemToast(`${imported} song${imported === 1 ? '' : 's'} added to offline vault`);
+      } else {
+        triggerSystemToast("No audio files were imported");
+      }
+    }
+
+    // Removes a track from the playlist currently being viewed —
+    // the track itself stays in the library.
+    function removeTrackFromCurrentPlaylist(trackId) {
+      if (!currentTabIndex.startsWith('playlist-')) return;
+      const pId = currentTabIndex.replace('playlist-', '');
+      const playlist = playlistLibrary.find(p => p.id === pId);
+      if (!playlist) return;
+      const idx = playlist.tracks.indexOf(trackId);
+      if (idx === -1) return;
+      playlist.tracks.splice(idx, 1);
+      localStorage.setItem('sonata_playlists', JSON.stringify(playlistLibrary));
+      syncToCloud(() => window.SonataCloud.savePlaylist(playlist));
+      triggerSystemToast(`Removed from "${playlist.name}"`);
+      renderTracksDashboard();
+    }
+
+    // ---- PERMISSIONS GATE ----
+    // Web apps can't intercept every OS activity like a native permission
+    // manager, but Sonata asks up front for the real capabilities it uses.
+    // "Allow" requests persistent storage, which protects the IndexedDB
+    // offline vault from being evicted under storage pressure.
+    function maybeShowPermissionsGate() {
+      if (localStorage.getItem('sonata_permissions_ack') === '1') return;
+      document.getElementById('modal-permissions').classList.remove('hidden');
+    }
+    async function grantSonataPermissions() {
+      localStorage.setItem('sonata_permissions_ack', '1');
+      document.getElementById('modal-permissions').classList.add('hidden');
+      let persisted = false;
+      try {
+        if (navigator.storage && navigator.storage.persist) {
+          persisted = await navigator.storage.persist();
+        }
+      } catch (err) { /* unsupported browser — nothing to do */ }
+      triggerSystemToast(persisted ? "Storage protected — Sonata is all set" : "Preferences saved");
+    }
+    function dismissPermissionsGate() {
+      localStorage.setItem('sonata_permissions_ack', '1');
+      document.getElementById('modal-permissions').classList.add('hidden');
+      triggerSystemToast("You can allow permissions later in Settings");
+    }
+
+    // ================================================================
+    // EQUALIZER — Web Audio 5-band EQ on the offline vault engine.
+    // YouTube's IFrame audio is cross-origin sealed and can't be routed
+    // through Web Audio, so the EQ honestly applies to local tracks only.
+    // The graph is built lazily on first use (AudioContext needs a user
+    // gesture) and a MediaElementSource can only ever be created once
+    // per element, so both live behind ensureEqGraph().
+    // ================================================================
+    const EQ_FREQUENCIES = [60, 230, 910, 3600, 14000];
+    const EQ_PRESETS = {
+      flat:       [0, 0, 0, 0, 0],
+      bass:       [7, 5, 1, 0, 1],
+      vocal:      [-2, 1, 5, 4, 0],
+      treble:     [0, 0, 1, 5, 7],
+      electronic: [6, 2, -1, 3, 5],
+      rock:       [5, 3, -1, 2, 4]
+    };
+    let eqEnabled = localStorage.getItem('sonata_eq_on') === '1';
+    let eqGains = JSON.parse(localStorage.getItem('sonata_eq_gains') || '[0,0,0,0,0]');
+    if (!Array.isArray(eqGains) || eqGains.length !== 5) eqGains = [0, 0, 0, 0, 0];
+    let eqAudioCtx = null;
+    let eqFilterNodes = null;
+    let eqAnalyserNode = null;
+
+    function ensureEqGraph() {
+      const la = getLocalAudio();
+      if (!la) return false;
+      try {
+        if (!eqAudioCtx) {
+          eqAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+          const source = eqAudioCtx.createMediaElementSource(la);
+          eqFilterNodes = EQ_FREQUENCIES.map((freq, i) => {
+            const f = eqAudioCtx.createBiquadFilter();
+            f.type = i === 0 ? 'lowshelf' : i === EQ_FREQUENCIES.length - 1 ? 'highshelf' : 'peaking';
+            f.frequency.value = freq;
+            if (f.type === 'peaking') f.Q.value = 1;
+            f.gain.value = 0;
+            return f;
+          });
+          source.connect(eqFilterNodes[0]);
+          for (let i = 0; i < eqFilterNodes.length - 1; i++) {
+            eqFilterNodes[i].connect(eqFilterNodes[i + 1]);
+          }
+          // Analyser taps the post-EQ signal for the live cover visualizer,
+          // so the wave shows exactly what the listener hears.
+          eqAnalyserNode = eqAudioCtx.createAnalyser();
+          eqAnalyserNode.fftSize = 128;
+          eqAnalyserNode.smoothingTimeConstant = 0.82;
+          eqFilterNodes[eqFilterNodes.length - 1].connect(eqAnalyserNode);
+          eqAnalyserNode.connect(eqAudioCtx.destination);
+        }
+        if (eqAudioCtx.state === 'suspended') eqAudioCtx.resume();
+        return true;
+      } catch (err) {
+        console.error('EQ graph failed:', err);
+        return false;
+      }
+    }
+
+    function applyEqGains() {
+      if (!eqFilterNodes) return;
+      eqFilterNodes.forEach((f, i) => {
+        f.gain.value = eqEnabled ? eqGains[i] : 0;
+      });
+    }
+
+    function persistEqState() {
+      localStorage.setItem('sonata_eq_on', eqEnabled ? '1' : '0');
+      localStorage.setItem('sonata_eq_gains', JSON.stringify(eqGains));
+    }
+
+    function toggleEqualizer() {
+      eqEnabled = !eqEnabled;
+      if (eqEnabled && !ensureEqGraph()) {
+        eqEnabled = false;
+        triggerSystemToast("Equalizer unavailable on this browser");
+        return;
+      }
+      applyEqGains();
+      persistEqState();
+      updateEqModalUI();
+      triggerSystemToast(eqEnabled ? "Equalizer on" : "Equalizer off");
+    }
+
+    function setEqBand(bandIdx, db) {
+      eqGains[bandIdx] = db;
+      // Nudging a slider while off implies intent — switch on automatically.
+      if (!eqEnabled && ensureEqGraph()) eqEnabled = true;
+      applyEqGains();
+      persistEqState();
+      updateEqModalUI();
+    }
+
+    function applyEqPreset(name) {
+      const preset = EQ_PRESETS[name];
+      if (!preset) return;
+      eqGains = [...preset];
+      if (!eqEnabled && ensureEqGraph()) eqEnabled = true;
+      applyEqGains();
+      persistEqState();
+      updateEqModalUI();
+      triggerSystemToast(`EQ preset: ${name === 'flat' ? 'Flat' : name.charAt(0).toUpperCase() + name.slice(1)}`);
+    }
+
+    function detectActiveEqPreset() {
+      for (const [name, vals] of Object.entries(EQ_PRESETS)) {
+        if (vals.every((v, i) => v === eqGains[i])) return name;
+      }
+      return null;
+    }
+
+    function updateEqModalUI() {
+      const row = document.getElementById('row-eq-enabled');
+      if (row) {
+        row.classList.toggle('on', eqEnabled);
+        row.setAttribute('aria-checked', eqEnabled ? 'true' : 'false');
+      }
+      const rack = document.getElementById('eq-bands-rack');
+      if (rack) {
+        rack.classList.toggle('eq-rack-off', !eqEnabled);
+        rack.querySelectorAll('input[type="range"]').forEach(input => {
+          const i = parseInt(input.dataset.band, 10);
+          input.value = eqGains[i];
+          const label = document.getElementById(`eq-db-${i}`);
+          if (label) label.innerText = (eqGains[i] > 0 ? '+' : '') + eqGains[i];
+        });
+      }
+      const activePreset = detectActiveEqPreset();
+      document.querySelectorAll('.eq-preset').forEach(btn => {
+        btn.classList.toggle('selected', eqEnabled && btn.dataset.preset === activePreset);
+      });
+      const eqBtn = document.getElementById('np-btn-eq');
+      if (eqBtn) eqBtn.classList.toggle('toggle-active', eqEnabled);
+      const note = document.getElementById('eq-context-note');
+      if (note) {
+        note.innerText = isCurrentTrackLocal() || activeQueuePointer === -1
+          ? "Shapes offline vault playback"
+          : "YouTube streams can't be EQ'd \u2014 plays flat. Offline songs get the full effect.";
+      }
+    }
+
+    // ---- LIVE WAVE COVER (offline tracks) ----
+    // Replaces the static offline cover with the track's real spectrum:
+    // mirrored rounded bars fed by the analyser, colored from the live
+    // CSS accent so every theme (light/dark/OLED/emerald) matches itself.
+    let npWaveRafId = null;
+
+    function npWaveShouldRun() {
+      return isCurrentTrackLocal()
+        && !document.getElementById('modal-now-playing').classList.contains('hidden');
+    }
+
+    function readWaveThemeColors() {
+      const styles = getComputedStyle(document.documentElement);
+      const accent = (styles.getPropertyValue('--accent-rgb') || '99, 102, 241').trim();
+      const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+      return { accent, isLight };
+    }
+
+    function drawNpWaveFrame() {
+      npWaveRafId = null;
+      const canvas = document.getElementById('np-wave-canvas');
+      if (!canvas || !npWaveShouldRun()) return;
+
+      const dpr = window.devicePixelRatio || 1;
+      const w = canvas.clientWidth, h = canvas.clientHeight;
+      if (canvas.width !== w * dpr || canvas.height !== h * dpr) {
+        canvas.width = w * dpr;
+        canvas.height = h * dpr;
+      }
+      const ctx = canvas.getContext('2d');
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, w, h);
+
+      const { accent, isLight } = readWaveThemeColors();
+      const la = getLocalAudio();
+      const playing = la && !la.paused;
+
+      const barCount = 28;
+      const gap = 3;
+      const barW = (w - gap * (barCount + 1)) / barCount;
+      const mid = h / 2;
+      let levels;
+
+      if (eqAnalyserNode && playing) {
+        const bins = new Uint8Array(eqAnalyserNode.frequencyBinCount);
+        eqAnalyserNode.getByteFrequencyData(bins);
+        // Center-out mapping: the middle bars carry the lowest frequencies
+        // (the beat), rising symmetrically to the highs at both edges —
+        // so every kick visibly blooms from the center outward.
+        const half = (barCount - 1) / 2;
+        levels = Array.from({ length: barCount }, (_, i) => {
+          const dist = Math.abs(i - half) / half; // 0 at center → 1 at edges
+          const v = bins[Math.floor(dist * bins.length * 0.72)] / 255;
+          return Math.max(v * v, 0.04); // perceptual curve, tiny floor
+        });
+      } else {
+        // Idle/paused: a calm ripple radiating from the center outward
+        const t = Date.now() / 900;
+        const half = (barCount - 1) / 2;
+        levels = Array.from({ length: barCount }, (_, i) => {
+          const dist = Math.abs(i - half);
+          return 0.05 + 0.045 * Math.abs(Math.sin(t - dist * 0.5));
+        });
+      }
+
+      ctx.lineCap = 'round';
+      for (let i = 0; i < barCount; i++) {
+        const x = gap + i * (barW + gap) + barW / 2;
+        const len = Math.max(levels[i] * (h * 0.42), 2);
+        const grad = ctx.createLinearGradient(0, mid - len, 0, mid + len);
+        grad.addColorStop(0, `rgba(${accent}, ${isLight ? 0.9 : 1})`);
+        grad.addColorStop(0.5, `rgba(${accent}, ${isLight ? 0.55 : 0.65})`);
+        grad.addColorStop(1, `rgba(${accent}, ${isLight ? 0.9 : 1})`);
+        ctx.strokeStyle = grad;
+        ctx.lineWidth = barW;
+        ctx.shadowColor = `rgba(${accent}, ${isLight ? 0.25 : 0.55})`;
+        ctx.shadowBlur = playing ? 10 : 4;
+        ctx.beginPath();
+        ctx.moveTo(x, mid - len);
+        ctx.lineTo(x, mid + len);
+        ctx.stroke();
+      }
+      ctx.shadowBlur = 0;
+
+      npWaveRafId = requestAnimationFrame(drawNpWaveFrame);
+    }
+
+    function startNpWaveLoop() {
+      if (npWaveRafId === null && npWaveShouldRun()) {
+        npWaveRafId = requestAnimationFrame(drawNpWaveFrame);
+      }
+    }
+    function stopNpWaveLoop() {
+      if (npWaveRafId !== null) {
+        cancelAnimationFrame(npWaveRafId);
+        npWaveRafId = null;
+      }
+    }
+
+    function openEqualizerModal() {
+      updateEqModalUI();
+      document.getElementById('modal-equalizer').classList.remove('hidden');
+    }
+    function closeEqualizerModal() {
+      document.getElementById('modal-equalizer').classList.add('hidden');
+    }
+
     function executeAudioStreamPipeline(track) {
       if(!track) return;
       clearInterval(timelineUpdateInterval);
@@ -4422,7 +5272,16 @@
       updateMediaSessionMetadata(track);
       updateMediaSessionPlaybackState('playing');
 
-      bootstrapYoutubeIframePlayer(track.id);
+      if (track.type === 'local') {
+        if (ytPlayer && ytPlayer.stopVideo) { try { ytPlayer.stopVideo(); } catch (err) {} }
+        bootstrapLocalAudioPlayback(track.id);
+        clearInterval(timelineUpdateInterval);
+        initTrackTimelineTicker();
+      } else {
+        const la = getLocalAudio();
+        if (la && !la.paused) la.pause();
+        bootstrapYoutubeIframePlayer(track.id);
+      }
       renderTracksDashboard();
     }
 
@@ -4498,10 +5357,17 @@
         }
         return;
       }
-      if (repeatMode === 'one' && ytPlayer) {
-        ytPlayer.seekTo(0, true);
-        ytPlayer.playVideo();
-        return;
+      if (repeatMode === 'one') {
+        if (isCurrentTrackLocal()) {
+          const la = getLocalAudio();
+          if (la) { la.currentTime = 0; la.play().catch(() => {}); }
+          return;
+        }
+        if (ytPlayer) {
+          ytPlayer.seekTo(0, true);
+          ytPlayer.playVideo();
+          return;
+        }
       }
       const nextIdx = computeAdjacentIndex(1, /* wrapAlways */ false);
       if (nextIdx === -1) {
@@ -4520,7 +5386,13 @@
         let currentTime = 0;
         let duration = 0;
 
-        if(ytPlayer && ytPlayer.getCurrentTime) {
+        if (isCurrentTrackLocal()) {
+          const la = getLocalAudio();
+          if (la && la.duration && isFinite(la.duration)) {
+            currentTime = la.currentTime;
+            duration = la.duration;
+          } else { duration = 1; }
+        } else if(ytPlayer && ytPlayer.getCurrentTime) {
           currentTime = ytPlayer.getCurrentTime();
           duration = ytPlayer.getDuration() || 1;
         }
@@ -4537,7 +5409,7 @@
         // (was never wired up before, so it silently stayed at "0:00").
         const stripDurationNode = document.getElementById('strip-duration-node');
         if(stripDurationNode) {
-          const hasValidDuration = ytPlayer && ytPlayer.getDuration && ytPlayer.getDuration() > 1;
+          const hasValidDuration = duration > 1;
           if(hasValidDuration) {
             const remaining = Math.max(duration - currentTime, 0);
             stripDurationNode.innerText = "-" + formatTimeStrings(remaining);
@@ -4575,6 +5447,11 @@
     }
 
     function seekToAudioRatioPosition(ratio) {
+      if (isCurrentTrackLocal()) {
+        const la = getLocalAudio();
+        if (la && la.duration && isFinite(la.duration)) la.currentTime = la.duration * ratio;
+        return;
+      }
       if(ytPlayer && ytPlayer.getDuration) {
         ytPlayer.seekTo(ytPlayer.getDuration() * ratio, true);
       }
@@ -4587,6 +5464,14 @@
     }
 
     function togglePlaybackState() {
+      if (isCurrentTrackLocal()) {
+        const la = getLocalAudio();
+        if (!la || !la.src) return;
+        // UI syncing happens in the engine's play/pause event listeners.
+        if (la.paused) la.play().catch(() => {}); else la.pause();
+        return;
+      }
+
       const wave = document.getElementById('dock-wave');
       const playBtn = document.getElementById('dock-btn-play');
 
@@ -4688,7 +5573,13 @@
 
       trackLibrary = trackLibrary.filter(t => t.id !== trackId);
       localStorage.setItem('sonata_library', JSON.stringify(trackLibrary));
-      syncToCloud(() => window.SonataCloud.deleteTrack(trackId));
+      if (trackId.startsWith('local-')) {
+        idbDeleteAudio(trackId).catch(() => {});
+        const laDel = getLocalAudio();
+        if (laDel && activeQueue[activeQueuePointer] && activeQueue[activeQueuePointer].id === trackId) laDel.pause();
+      } else {
+        syncToCloud(() => window.SonataCloud.deleteTrack(trackId));
+      }
 
       recentlyPlayed = recentlyPlayed.filter(id => id !== trackId);
       localStorage.setItem('sonata_recent', JSON.stringify(recentlyPlayed));
